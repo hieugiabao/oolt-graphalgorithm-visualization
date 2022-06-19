@@ -2,9 +2,7 @@ package hust.soict.hedspi.model.algo.spanning;
 
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import hust.soict.hedspi.model.algo.step.State;
 import hust.soict.hedspi.model.algo.step.Step;
@@ -14,7 +12,6 @@ import hust.soict.hedspi.model.graph.Vertex;
 import hust.soict.hedspi.utils.UnionFind;
 
 public class Kruskal extends SpanningTreeAlgorithm {
-  Map<Integer, String> pseudoCode = new HashMap<Integer, String>();
 
   public Kruskal(BaseGraph<Edge> graph) {
     super(graph);
@@ -104,6 +101,7 @@ public class Kruskal extends SpanningTreeAlgorithm {
       vertexHighlighted.remove(source);
       vertexHighlighted.remove(target);
       edgeQueued.remove(edge);
+
       state = new State(vertexList, edgeList, vertexHighlighted,
           edgeHighlighted, vertexTraversed, edgeTraversed, edgeQueued);
       status = added
@@ -122,20 +120,6 @@ public class Kruskal extends SpanningTreeAlgorithm {
     steps.add(new Step(state, status, 7));
 
     return tree;
-  }
-
-  @Override
-  public void printStep() {
-    if (steps.isEmpty()) {
-      spanningTree = getSpanningTree();
-    }
-    for (Step step : steps) {
-      for (int i : step.getLineNo()) {
-        System.out.println(pseudoCode.get(i));
-      }
-      System.out.println(step.getStatus());
-      System.out.println();
-    }
   }
 
 }
