@@ -1,5 +1,7 @@
 package hust.soict.hedspi.model.algo.spanning;
 
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.Set;
 
 import hust.soict.hedspi.model.graph.Edge;
@@ -8,9 +10,9 @@ public class SpanningTree {
   private final double weight;
   private final Set<Edge> edges;
 
-  public SpanningTree(double weight, Set<Edge> edges) {
+  public SpanningTree(double weight, Collection<Edge> edges) {
     this.weight = weight;
-    this.edges = edges;
+    this.edges = new HashSet<>(edges);
   }
 
   public double getWeight() {

@@ -13,10 +13,13 @@ import hust.soict.hedspi.model.graph.UndirectedGraph;
 public class Application {
 	public static void main(String[] args) {
 		UndirectedGraph graph = (UndirectedGraph) BaseGraph.CP410();
-		Algorithm a1 = new Kruskal(graph);
+		Kruskal a1 = new Kruskal(graph);
 
-		Context context = new Context();
-		context.setAlgorithm(a1);
-		context.doExploration();
+		a1.printStep();
+		/*
+		 * Context context = new Context();
+		 * context.setAlgorithm(a1);
+		 * context.doExploration();
+		 */
 	}
 }
