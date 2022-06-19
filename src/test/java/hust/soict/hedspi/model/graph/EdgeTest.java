@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-public class EdgeTest {
+class EdgeTest {
   Edge e1, e2;
   DirectedEdge de1, de2;
 

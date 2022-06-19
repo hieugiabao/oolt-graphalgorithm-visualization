@@ -1,22 +1,22 @@
 package hust.soict.hedspi;
 
-import hust.soict.hedspi.model.graph.DirectedGraph;
-import hust.soict.hedspi.model.graph.Vertex;
+import hust.soict.hedspi.model.Context;
+import hust.soict.hedspi.model.algo.Algorithm;
+import hust.soict.hedspi.model.algo.spanning.Kruskal;
+import hust.soict.hedspi.model.graph.BaseGraph;
+import hust.soict.hedspi.model.graph.UndirectedGraph;
 
 /**
  * Hello world!
  *
  */
 public class Application {
-    public static void main(String[] args) {
-        DirectedGraph digraph = new DirectedGraph();
-        digraph.addVertex(new Vertex(0));
-        digraph.addVertex(new Vertex(1));
-        digraph.addVertex(new Vertex(2));
+	public static void main(String[] args) {
+		UndirectedGraph graph = (UndirectedGraph) BaseGraph.CP410();
+		Algorithm a1 = new Kruskal(graph);
 
-        digraph.addEdge(new Vertex(0), new Vertex(1));
-        if (digraph.addEdge(new Vertex(1), new Vertex(0)) == null) {
-            System.out.println("ok");
-        }
-    }
+		Context context = new Context();
+		context.setAlgorithm(a1);
+		context.doExploration();
+	}
 }
