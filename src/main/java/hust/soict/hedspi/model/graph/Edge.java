@@ -1,5 +1,7 @@
 package hust.soict.hedspi.model.graph;
 
+import hust.soict.hedspi.annotation.LabelSource;
+
 public class Edge implements Comparable<Edge> {
   public static final double DEFAULT_EDGE_WEIGHT = 1.0d;
   protected Vertex source;
@@ -25,6 +27,7 @@ public class Edge implements Comparable<Edge> {
     return target;
   }
 
+  @LabelSource
   public double getWeight() {
     return weight;
   }

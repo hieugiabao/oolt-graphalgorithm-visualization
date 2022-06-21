@@ -1,5 +1,7 @@
 package hust.soict.hedspi.model.graph;
 
+import hust.soict.hedspi.annotation.LabelSource;
+
 public class Vertex {
   private int id;
 
@@ -7,6 +9,7 @@ public class Vertex {
     this.id = id;
   }
 
+  @LabelSource
   public int getId() {
     return id;
   }
