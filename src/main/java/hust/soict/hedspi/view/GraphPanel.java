@@ -12,6 +12,7 @@ import hust.soict.hedspi.annotation.LabelSource;
 import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
+import hust.soict.hedspi.utils.TypeUtil;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
 import javafx.scene.control.Tooltip;
@@ -19,7 +20,7 @@ import javafx.scene.layout.Pane;
 import static hust.soict.hedspi.utils.Utilities.*;
 
 public class GraphPanel extends Pane {
-  private final BaseGraph<Edge> graph;
+  private final BaseGraph<?> graph;
   private final Map<Vertex, VertexView> vertexNodes;
   private final Map<Edge, EdgeView> edgeNodes;
   private final boolean edgesWithArrows;
@@ -27,7 +28,7 @@ public class GraphPanel extends Pane {
   private AnimationTimer timer;
   private boolean initialized = false;
 
-  public GraphPanel(BaseGraph<Edge> graph) {
+  public GraphPanel(BaseGraph<?> graph) {
     if (graph == null)
       throw new IllegalArgumentException("Graph cannot be null");
     this.graph = graph;
@@ -57,8 +58,7 @@ public class GraphPanel extends Pane {
     List<Edge> edgesToPlace = new LinkedList<>(graph.edgeSet());
 
     for (Vertex vertex : vertexNodes.keySet()) {
-      Set<Edge> incomingEdges = graph.incomingEdgesOf(vertex);
-
+      Set<Edge> incomingEdges = TypeUtil.uncheckedCast(graph.incomingEdgesOf(vertex));
       for (Edge edge : incomingEdges) {
         if (!edgesToPlace.contains(edge))
           continue;
@@ -110,7 +110,7 @@ public class GraphPanel extends Pane {
         if (v == other)
           continue;
 
-        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(), 25000);
+        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(), 80000);
 
         double deltaForceX = 0, deltaForceY = 0;
 

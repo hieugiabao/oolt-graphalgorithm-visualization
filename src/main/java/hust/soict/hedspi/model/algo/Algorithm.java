@@ -5,14 +5,13 @@ import java.util.List;
 
 import hust.soict.hedspi.model.algo.step.Step;
 import hust.soict.hedspi.model.graph.BaseGraph;
-import hust.soict.hedspi.model.graph.Edge;
 
 public abstract class Algorithm {
-  protected BaseGraph<Edge> graph;
+  protected BaseGraph<?> graph;
 
   protected List<Step> steps = new ArrayList<Step>();
 
-  public Algorithm(BaseGraph<Edge> graph) {
+  public Algorithm(BaseGraph<?> graph) {
     this.graph = graph;
   }
 
@@ -20,7 +19,7 @@ public abstract class Algorithm {
     this(null);
   }
 
-  public void setGraph(BaseGraph<Edge> graph) {
+  public void setGraph(BaseGraph<?> graph) {
     this.graph = graph;
   }
 

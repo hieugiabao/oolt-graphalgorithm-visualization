@@ -110,7 +110,7 @@ public abstract class BaseGraph<E extends Edge> {
 
   public abstract Set<E> outgoingEdgesOf(Vertex v);
 
-  public static BaseGraph<Edge> CP410() {
+  public static BaseGraph<?> CP410() {
     UndirectedGraph graph = new UndirectedGraph();
     Vertex v0 = new Vertex(0);
     Vertex v1 = new Vertex(1);

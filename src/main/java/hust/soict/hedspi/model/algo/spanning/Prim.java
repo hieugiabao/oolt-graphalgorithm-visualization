@@ -7,7 +7,7 @@ import hust.soict.hedspi.model.graph.Vertex;
 public class Prim extends SpanningTreeAlgorithm {
   private Vertex start;
 
-  public Prim(BaseGraph<Edge> graph, Vertex start) {
+  public Prim(BaseGraph<?> graph, Vertex start) {
     super(graph);
     this.start = start;
     pseudoCode.put(1, "T = {start}");

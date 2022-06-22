@@ -1,6 +1,7 @@
 package hust.soict.hedspi;
 
 import hust.soict.hedspi.model.graph.BaseGraph;
+import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.UndirectedGraph;
 import hust.soict.hedspi.utils.TypeUtil;
 import hust.soict.hedspi.view.GraphPanel;

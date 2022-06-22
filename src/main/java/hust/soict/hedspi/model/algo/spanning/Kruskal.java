@@ -13,7 +13,7 @@ import hust.soict.hedspi.utils.UnionFind;
 
 public class Kruskal extends SpanningTreeAlgorithm {
 
-  public Kruskal(BaseGraph<Edge> graph) {
+  public Kruskal(BaseGraph<?> graph) {
     super(graph);
     pseudoCode.put(1, "Sort E edges by increasing weight");
     pseudoCode.put(2, "T = {}");

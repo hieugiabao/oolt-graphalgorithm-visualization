@@ -12,7 +12,7 @@ import hust.soict.hedspi.model.graph.Edge;
 public abstract class SpanningTreeAlgorithm extends Algorithm {
   protected final Map<Integer, String> pseudoCode = new HashMap<Integer, String>();
 
-  protected SpanningTreeAlgorithm(BaseGraph<Edge> graph) {
+  protected SpanningTreeAlgorithm(BaseGraph<?> graph) {
     super(graph);
   }
 
