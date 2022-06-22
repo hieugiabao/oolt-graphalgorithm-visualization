@@ -52,8 +52,8 @@ public class EdgeView extends Line {
     rotation.pivotXProperty().bind(translateXProperty());
     rotation.pivotYProperty().bind(translateYProperty());
     rotation.angleProperty().bind(
-        toDegrees(atan2(endXProperty().subtract(startXProperty()),
-            endYProperty().subtract(startYProperty()))));
+        toDegrees(atan2(endYProperty().subtract(startYProperty()),
+            endXProperty().subtract(startXProperty()))));
 
     arrow.getTransforms().add(rotation);
     Translate translation = new Translate(-target.getRadius(), 0);
