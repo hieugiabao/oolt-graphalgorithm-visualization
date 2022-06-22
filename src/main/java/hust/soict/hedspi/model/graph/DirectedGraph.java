@@ -35,7 +35,7 @@ public class DirectedGraph extends BaseGraph<DirectedEdge> {
     Set<DirectedEdge> result = new HashSet<>();
     for (DirectedEdge e : edgeSet()) {
       if (e.getTarget().equals(v)) {
-        edges.add(e);
+        result.add(e);
       }
     }
     return result;
@@ -46,7 +46,7 @@ public class DirectedGraph extends BaseGraph<DirectedEdge> {
     Set<DirectedEdge> result = new HashSet<>();
     for (DirectedEdge e : edgeSet()) {
       if (e.getSource().equals(v)) {
-        edges.add(e);
+        result.add(e);
       }
     }
     return result;
