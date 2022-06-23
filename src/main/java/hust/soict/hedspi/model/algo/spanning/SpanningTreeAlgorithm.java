@@ -40,7 +40,7 @@ public abstract class SpanningTreeAlgorithm extends Algorithm {
     }
     for (Step step : steps) {
       for (int i : step.getLineNo()) {
-        System.out.println(pseudoCode.get(i));
+        System.out.println(i + "." + pseudoCode.get(i));
       }
       System.out.println(step.getStatus());
       System.out.println();

@@ -21,11 +21,11 @@ public class State {
         && edgeTraversed == null && edgeQueued == null;
 
     for (Vertex v : vertexList) {
-      vertexStateMap.put(v, new VertexState(v, isDisable ? VERTEX_STATE.DISABLED : VERTEX_STATE.DEFAULT));
+      vertexStateMap.put(v, new VertexState(v, isDisable ? VERTEX_STATE.QUEUED : VERTEX_STATE.DEFAULT));
     }
 
     for (Edge e : edgeList) {
-      edgeStateMap.put(e, new EdgeState(e, isDisable ? EDGE_STATE.DISABLED : EDGE_STATE.DEFAULT));
+      edgeStateMap.put(e, new EdgeState(e, isDisable ? EDGE_STATE.QUEUED : EDGE_STATE.DEFAULT));
     }
 
     if (edgeQueued != null)
@@ -158,13 +158,13 @@ public class State {
     DEFAULT, // default state
     HIGHLIGHTED, // highlighted state
     TRAVERSED, // traversed state
-    DISABLED, // disabled state
+    QUEUED, // queued state
   }
 
   public static enum EDGE_STATE {
     DEFAULT, // default state
     HIGHLIGHTED, // highlighted state
     TRAVERSED, // traversed state
-    DISABLED, // disabled state
+    QUEUED, // queued state
   }
 }

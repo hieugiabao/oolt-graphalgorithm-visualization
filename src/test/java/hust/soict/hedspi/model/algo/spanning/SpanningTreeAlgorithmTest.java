@@ -37,4 +37,10 @@ class SpanningTreeAlgorithmTest {
      * () -> assertEquals(tree.getEdges(), algo.getSpanningTree().getEdges()));
      */
   }
+
+  @Test
+  void testPrim() {
+    algo = new Prim(BaseGraph.CP410());
+    assertEquals(tree, algo.getSpanningTree());
+  }
 }
