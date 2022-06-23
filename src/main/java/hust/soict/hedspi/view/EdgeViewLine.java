@@ -7,16 +7,17 @@ import javafx.scene.shape.Line;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
 
-public class EdgeView extends Line {
+public class EdgeViewLine extends Line implements BaseEdgeView {
   private final Edge edge;
 
+  private final StyleProxy styleProxy;
   private final VertexView source;
   private final VertexView target;
 
   private Label attachedLabel = null;
   private Arrow attachedArrow = null;
 
-  public EdgeView(Edge e, VertexView source, VertexView target) {
+  public EdgeViewLine(Edge e, VertexView source, VertexView target) {
     if (source == null || target == null) {
       throw new IllegalArgumentException("Cannot connect null vertex");
     }
@@ -24,7 +25,8 @@ public class EdgeView extends Line {
     this.edge = e;
     this.source = source;
     this.target = target;
-    getStyleClass().add("edge");
+    styleProxy = new StyleProxy(this);
+    styleProxy.addStyleClass("edge");
 
     startXProperty().bind(target.centerXProperty());
     startYProperty().bind(target.centerYProperty());
@@ -32,6 +34,7 @@ public class EdgeView extends Line {
     endYProperty().bind(source.centerYProperty());
   }
 
+  @Override
   public void attachLabel(Label label) {
     this.attachedLabel = label;
     label.xProperty().bind(
@@ -42,6 +45,7 @@ public class EdgeView extends Line {
             .add(label.getLayoutBounds().getHeight() / 1.5));
   }
 
+  @Override
   public void attachArrow(Arrow arrow) {
     this.attachedArrow = arrow;
     arrow.translateXProperty().bind(endXProperty());
@@ -60,16 +64,38 @@ public class EdgeView extends Line {
     arrow.getTransforms().add(translation);
   }
 
+  @Override
   public Label getAttachedLabel() {
     return attachedLabel;
   }
 
-  public Arrow getAttachedArrow() {
-    return attachedArrow;
-  }
-
+  @Override
   public Edge getEdge() {
     return edge;
+  }
+
+  @Override
+  public void setStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    styleProxy.setStyleClass(cssClass);
+  }
+
+  @Override
+  public void addStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    styleProxy.addStyleClass(cssClass);
+  }
+
+  @Override
+  public boolean removeStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    return styleProxy.removeStyleClass(cssClass);
+  }
+
+  @Override
+  public Arrow getAttatchedArrow() {
+    // TODO Auto-generated method stub
+    return this.attachedArrow;
   }
 
 }

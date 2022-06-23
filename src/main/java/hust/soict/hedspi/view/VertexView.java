@@ -8,10 +8,11 @@ import hust.soict.hedspi.model.graph.Vertex;
 import javafx.geometry.Point2D;
 import javafx.scene.shape.Circle;
 
-public class VertexView extends Circle {
+public class VertexView extends Circle implements StylableNode, LabeledNode {
   private final Vertex vertex;
   private final Set<VertexView> adjVerteices;
 
+  private final StyleProxy styleProxy;
   private Label attachedLabel = null;
 
   private final PointVector forceVector = new PointVector(0, 0);
@@ -21,7 +22,8 @@ public class VertexView extends Circle {
     super(x, y, radius);
     this.vertex = v;
     this.adjVerteices = new HashSet<>();
-    this.getStyleClass().add("vertex");
+    this.styleProxy = new StyleProxy(this);
+    styleProxy.addStyleClass("vertex");
   }
 
   public boolean addAdjacentVertex(VertexView v) {
@@ -57,13 +59,15 @@ public class VertexView extends Circle {
     return vertex;
   }
 
+  @Override
   public void attachLabel(Label label) {
     this.attachedLabel = label;
     label.xProperty().bind(this.centerXProperty().subtract(label.getLayoutBounds().getWidth() / 2.0));
     label.yProperty().bind(this.centerYProperty().add(label.getLayoutBounds().getHeight() / 4.0));
   }
 
-  public Label getAttachedLabel() {
+  @Override
+  public StylableNode getAttachedLabel() {
     return attachedLabel;
   }
 
@@ -119,5 +123,23 @@ public class VertexView extends Circle {
       this.x = x;
       this.y = y;
     }
+  }
+
+  @Override
+  public void setStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    styleProxy.setStyleClass(cssClass);
+  }
+
+  @Override
+  public void addStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    styleProxy.addStyleClass(cssClass);
+  }
+
+  @Override
+  public boolean removeStyleClass(String cssClass) {
+    // TODO Auto-generated method stub
+    return styleProxy.removeStyleClass(cssClass);
   }
 }

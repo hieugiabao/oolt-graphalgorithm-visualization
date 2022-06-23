@@ -15,6 +15,7 @@ import hust.soict.hedspi.model.graph.Vertex;
 import hust.soict.hedspi.utils.TypeUtil;
 import javafx.animation.AnimationTimer;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
 import static hust.soict.hedspi.utils.Utilities.*;
@@ -22,7 +23,7 @@ import static hust.soict.hedspi.utils.Utilities.*;
 public class GraphPanel extends Pane {
   private final BaseGraph<?> graph;
   private final Map<Vertex, VertexView> vertexNodes;
-  private final Map<Edge, EdgeView> edgeNodes;
+  private final Map<Edge, BaseEdgeView> edgeNodes;
   private final boolean edgesWithArrows;
 
   private AnimationTimer timer;
@@ -70,7 +71,8 @@ public class GraphPanel extends Pane {
         vertexView.addAdjacentVertex(oppositeVertexView);
         oppositeVertexView.addAdjacentVertex(vertexView);
 
-        addEdge(edge);
+        BaseEdgeView edgeView = createEdge(edge, vertexView, oppositeVertexView);
+        addEdge(edgeView, edge);
 
         edgesToPlace.remove(edge);
       }
@@ -144,29 +146,40 @@ public class GraphPanel extends Pane {
     }
   }
 
-  public EdgeView addEdge(Edge e) {
-    EdgeView view = new EdgeView(e, vertexNodes.get(e.getSource()), vertexNodes.get(e.getTarget()));
+  public void addEdge(BaseEdgeView ev, Edge e) {
 
-    this.getChildren().add(0, view);
-    edgeNodes.put(e, view);
+    this.getChildren().add(0, (Node) ev);
+    edgeNodes.put(e, ev);
 
     String labelText = generateEdgeLabel(e);
 
     Tooltip t = new Tooltip(labelText);
-    Tooltip.install(view, t);
+    Tooltip.install((Node) ev, t);
 
     Label label = new Label(labelText);
     label.getStyleClass().add("edge-label");
     this.getChildren().add(label);
-    view.attachLabel(label);
+    ev.attachLabel(label);
 
     if (this.edgesWithArrows) {
       Arrow arrow = new Arrow(5);
-      view.attachArrow(arrow);
+      ev.attachArrow(arrow);
       this.getChildren().add(arrow);
     }
+  }
 
-    return view;
+  private BaseEdgeView createEdge(Edge edge, VertexView vertexInView, VertexView vertexOutView) {
+    BaseEdgeView edgeView;
+    // TODO: create edge view base on source vertex and target vertex
+    if ((this.graph.getType().isDirected() && graph.containsEdge(edge.getTarget(), edge.getSource()))
+        || edge.getSource().equals(edge.getTarget())) {
+      // create curve edge
+      edgeView = null;
+    } else {
+      // create line edge
+      edgeView = new EdgeViewLine(edge, vertexInView, vertexOutView);
+    }
+    return edgeView;
   }
 
   public void addVertex(VertexView view) {
