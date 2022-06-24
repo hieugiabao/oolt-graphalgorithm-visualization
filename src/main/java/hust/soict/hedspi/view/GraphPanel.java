@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.Set;
 
 import hust.soict.hedspi.annotation.LabelSource;
@@ -28,16 +27,22 @@ public class GraphPanel extends Pane {
   private final Map<Vertex, VertexView> vertexNodes;
   private final Map<Edge, BaseEdgeView> edgeNodes;
   private final boolean edgesWithArrows;
+  private final PlacementStrategy placementStrategy;
 
   private final BooleanProperty automaticLayout;
   private AnimationTimer timer;
   private boolean initialized = false;
 
-  public GraphPanel(BaseGraph<?> graph) {
+  public GraphPanel(BaseGraph<?> graph, PlacementStrategy placementStrategy) {
     if (graph == null)
       throw new IllegalArgumentException("Graph cannot be null");
     this.graph = graph;
     this.edgesWithArrows = graph.getType().isDirected();
+
+    if (placementStrategy == null)
+      this.placementStrategy = new RandomPlacementStrategy();
+    else
+      this.placementStrategy = placementStrategy;
 
     vertexNodes = new HashMap<>();
     edgeNodes = new HashMap<>();
@@ -61,6 +66,10 @@ public class GraphPanel extends Pane {
         timer.stop();
       }
     });
+  }
+
+  public GraphPanel(BaseGraph<?> graph) {
+    this(graph, null);
   }
 
   public BooleanProperty automaticLayoutProperty() {
@@ -139,7 +148,7 @@ public class GraphPanel extends Pane {
           continue;
         }
         Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(),
-            edgesOf ? 60000 : 25000);
+            edgesOf ? 80000 : 25000);
 
         double deltaForceX = 0, deltaForceY = 0;
 
@@ -270,18 +279,6 @@ public class GraphPanel extends Pane {
     return e != null ? e.toString() : "NULL";
   }
 
-  private void place() {
-    double height = this.widthProperty().doubleValue();
-    double width = this.heightProperty().doubleValue();
-
-    Random rand = new Random();
-    for (VertexView v : vertexNodes.values()) {
-      double x = rand.nextDouble() * width;
-      double y = rand.nextDouble() * height;
-      v.setPosition(x, y);
-    }
-  }
-
   public synchronized void init() {
     if (this.getScene() == null) {
       throw new IllegalStateException("You must call this method after the instance was added to a scene.");
@@ -293,7 +290,7 @@ public class GraphPanel extends Pane {
       throw new IllegalStateException("Already initialized.");
     }
 
-    place();
+    placementStrategy.place(widthProperty().doubleValue(), heightProperty().doubleValue(), graph, vertexNodes.values());
     timer.start();
     this.initialized = true;
   }
