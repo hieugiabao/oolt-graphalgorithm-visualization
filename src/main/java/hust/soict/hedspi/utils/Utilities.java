@@ -43,4 +43,24 @@ public class Utilities {
     factor = force * Math.log(distance / scale) * 0.1;
     return vector.multiply(factor);
   }
+
+  public static Point2D rotate(final Point2D point, final Point2D pivot, double angle_degrees) {
+    double angle = Math.toRadians(angle_degrees);
+
+    double sin = Math.sin(angle);
+    double cos = Math.cos(angle);
+
+    // translate to origin
+    Point2D result = point.subtract(pivot);
+
+    // rotate point
+    Point2D rotatedOrigin = new Point2D(
+        result.getX() * cos - result.getY() * sin,
+        result.getX() * sin + result.getY() * cos);
+
+    // translate point back
+    result = rotatedOrigin.add(pivot);
+
+    return result;
+  }
 }

@@ -1,9 +1,11 @@
 package hust.soict.hedspi.view;
 
 import hust.soict.hedspi.model.graph.Edge;
+import javafx.geometry.Point2D;
 import javafx.scene.shape.CubicCurve;
 import javafx.scene.transform.Rotate;
 import javafx.scene.transform.Translate;
+import static hust.soict.hedspi.utils.Utilities.rotate;
 
 import static hust.soict.hedspi.utils.Utilities.*;
 
@@ -16,8 +18,13 @@ public class EdgeViewCurve extends CubicCurve implements BaseEdgeView {
 
   private Label attachedLabel = null;
   private Arrow attachedArrow = null;
+  private int angleFactor = 0;
 
   public EdgeViewCurve(Edge e, VertexView source, VertexView target) {
+    this(e, source, target, false);
+  }
+
+  public EdgeViewCurve(Edge e, VertexView source, VertexView target, boolean haveReverseEdge) {
     if (source == null || target == null) {
       throw new IllegalArgumentException("Cannot connect null vertex");
     }
@@ -32,6 +39,8 @@ public class EdgeViewCurve extends CubicCurve implements BaseEdgeView {
     startYProperty().bind(target.centerYProperty());
     endXProperty().bind(source.centerXProperty());
     endYProperty().bind(source.centerYProperty());
+
+    angleFactor = haveReverseEdge ? 1 : 0;
 
     enableListeners();
   }
@@ -55,10 +64,10 @@ public class EdgeViewCurve extends CubicCurve implements BaseEdgeView {
     // TODO: find control1 and control2 points
     if (source.equals(target)) {
       double midpointX1 = source.getCenterX() - target.getRadius() * 5;
-      double midpointY1 = source.getCenterY() - target.getRadius() * 2;
+      double midpointY1 = source.getCenterY() - target.getRadius() * 3;
 
       double midpointX2 = source.getCenterX() + target.getRadius() * 5;
-      double midpointY2 = source.getCenterY() - target.getRadius() * 2;
+      double midpointY2 = source.getCenterY() - target.getRadius() * 3;
 
       setControlX1(midpointX1);
       setControlY1(midpointY1);
@@ -66,6 +75,26 @@ public class EdgeViewCurve extends CubicCurve implements BaseEdgeView {
       setControlY2(midpointY2);
     } else {
       // atode
+      double midpointX = (source.getCenterX() + target.getCenterX()) / 2;
+      double midpointY = (source.getCenterY() + target.getCenterY()) / 2;
+
+      Point2D midPoint = new Point2D(midpointX, midpointY);
+
+      Point2D startPoint = new Point2D(source.getCenterX(), source.getCenterY());
+      Point2D endPoint = new Point2D(target.getCenterX(), target.getCenterY());
+
+      final double MAX_ANGLE = 20;
+      double distance = startPoint.distance(endPoint);
+      double angle = MAX_ANGLE - (distance / 15000 * MAX_ANGLE);
+
+      midPoint = rotate(midPoint,
+          angleFactor == 0 ? startPoint : endPoint,
+          (-angle) + angleFactor * (angle - (-angle)));
+
+      setControlX1(midPoint.getX());
+      setControlY1(midPoint.getY());
+      setControlX2(midPoint.getX());
+      setControlY2(midPoint.getY());
     }
   }
 

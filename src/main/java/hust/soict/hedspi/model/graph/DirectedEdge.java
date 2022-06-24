@@ -1,9 +1,18 @@
 package hust.soict.hedspi.model.graph;
 
+import hust.soict.hedspi.annotation.LabelSource;
+
 public class DirectedEdge extends Edge {
 
   public DirectedEdge(Vertex source, Vertex target) {
     super(source, target);
+  }
+
+  @Override
+  @LabelSource
+  public double getWeight() {
+    // TODO Auto-generated method stub
+    return super.getWeight();
   }
 
   @Override

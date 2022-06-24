@@ -10,6 +10,7 @@ import java.util.Set;
 
 import hust.soict.hedspi.annotation.LabelSource;
 import hust.soict.hedspi.model.graph.BaseGraph;
+import hust.soict.hedspi.model.graph.DirectedEdge;
 import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
 import hust.soict.hedspi.utils.TypeUtil;
@@ -112,7 +113,7 @@ public class GraphPanel extends Pane {
         if (v == other)
           continue;
 
-        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(), 80000);
+        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(), 100000);
 
         double deltaForceX = 0, deltaForceY = 0;
 
@@ -174,7 +175,11 @@ public class GraphPanel extends Pane {
     if ((this.graph.getType().isDirected() && graph.containsEdge(edge.getTarget(), edge.getSource()))
         || edge.getSource().equals(edge.getTarget())) {
       // create curve edge
-      edgeView = null;
+      if (edgeNodes.get(new DirectedEdge(edge.getTarget(), edge.getSource())) != null) {
+        edgeView = new EdgeViewCurve(edge, vertexInView, vertexOutView, true);
+        // System.out.println("co");
+      } else
+        edgeView = new EdgeViewCurve(edge, vertexInView, vertexOutView);
     } else {
       // create line edge
       edgeView = new EdgeViewLine(edge, vertexInView, vertexOutView);
