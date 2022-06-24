@@ -15,6 +15,8 @@ import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
 import hust.soict.hedspi.utils.TypeUtil;
 import javafx.animation.AnimationTimer;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
@@ -27,6 +29,7 @@ public class GraphPanel extends Pane {
   private final Map<Edge, BaseEdgeView> edgeNodes;
   private final boolean edgesWithArrows;
 
+  private final BooleanProperty automaticLayout;
   private AnimationTimer timer;
   private boolean initialized = false;
 
@@ -49,11 +52,28 @@ public class GraphPanel extends Pane {
         runLayoutIteration();
       }
     };
+
+    this.automaticLayout = new SimpleBooleanProperty(true);
+    this.automaticLayout.addListener((ov, oldvalue, newvalue) -> {
+      if (newvalue) {
+        timer.start();
+      } else {
+        timer.stop();
+      }
+    });
+  }
+
+  public BooleanProperty automaticLayoutProperty() {
+    return this.automaticLayout;
+  }
+
+  public void setAutomaticLayout(boolean value) {
+    automaticLayout.set(value);
   }
 
   private void initNodes() {
     for (Vertex vertex : graph.vertexSet()) {
-      VertexView vertexAnchor = new VertexView(vertex, 0, 0, 15);
+      VertexView vertexAnchor = new VertexView(vertex, 0, 0, 15, true);
       vertexNodes.put(vertex, vertexAnchor);
     }
 
@@ -87,12 +107,13 @@ public class GraphPanel extends Pane {
   }
 
   private synchronized void runLayoutIteration() {
-    for (int i = 0; i < 30; i++) {
+    for (int i = 0; i < 10; i++) {
       resetForces();
       computeForces();
       updateForces();
     }
     applyForces();
+    // System.out.println("update");
   }
 
   private void applyForces() {
@@ -109,11 +130,16 @@ public class GraphPanel extends Pane {
 
   private void computeForces() {
     for (VertexView v : vertexNodes.values()) {
+      boolean edgesOf = graph.edgesOf(v.getVertex()).size() > 0;
       for (VertexView other : vertexNodes.values()) {
         if (v == other)
           continue;
-
-        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(), 100000);
+        boolean haveEdge = graph.edgesOf(other.getVertex()).size() > 0;
+        if (!haveEdge) {
+          continue;
+        }
+        Point2D repellingForce = repellingForce(v.getUpdatedPosition(), other.getUpdatedPosition(),
+            edgesOf ? 60000 : 25000);
 
         double deltaForceX = 0, deltaForceY = 0;
 
@@ -126,6 +152,16 @@ public class GraphPanel extends Pane {
           deltaForceY = repellingForce.getY();
         }
         v.addForceVector(deltaForceX, deltaForceY);
+      }
+      if (!edgesOf) {
+        Vertex find = vertexNodes.keySet().stream().filter(vertex -> {
+          return !vertex.equals(v.getVertex()) && graph.edgesOf(vertex).size() > 0;
+        }).findFirst().get();
+        if (find != null) {
+          Point2D attractiveForce = attractiveForce(v.getUpdatedPosition(), vertexNodes.get(find).getUpdatedPosition(),
+              30, 8);
+          v.addForceVector(attractiveForce.getX(), attractiveForce.getY());
+        }
       }
     }
   }
@@ -147,7 +183,7 @@ public class GraphPanel extends Pane {
     }
   }
 
-  public void addEdge(BaseEdgeView ev, Edge e) {
+  private void addEdge(BaseEdgeView ev, Edge e) {
 
     this.getChildren().add(0, (Node) ev);
     edgeNodes.put(e, ev);
@@ -187,7 +223,7 @@ public class GraphPanel extends Pane {
     return edgeView;
   }
 
-  public void addVertex(VertexView view) {
+  private void addVertex(VertexView view) {
     this.getChildren().add(view);
 
     String labelText = generateVertexLabel(view.getVertex());
@@ -246,7 +282,7 @@ public class GraphPanel extends Pane {
     }
   }
 
-  public void init() {
+  public synchronized void init() {
     if (this.getScene() == null) {
       throw new IllegalStateException("You must call this method after the instance was added to a scene.");
     } else if (this.getWidth() == 0 || this.getHeight() == 0) {

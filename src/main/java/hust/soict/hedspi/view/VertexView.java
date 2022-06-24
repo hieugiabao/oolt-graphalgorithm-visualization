@@ -6,6 +6,7 @@ import java.util.Set;
 
 import hust.soict.hedspi.model.graph.Vertex;
 import javafx.geometry.Point2D;
+import javafx.scene.Cursor;
 import javafx.scene.shape.Circle;
 
 public class VertexView extends Circle implements StylableNode, LabeledNode {
@@ -14,16 +15,21 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
 
   private final StyleProxy styleProxy;
   private Label attachedLabel = null;
+  private boolean isDragging = false;
 
   private final PointVector forceVector = new PointVector(0, 0);
   private final PointVector updatedPosition = new PointVector(0, 0);
 
-  public VertexView(Vertex v, double x, double y, double radius) {
+  public VertexView(Vertex v, double x, double y, double radius, boolean allowMove) {
     super(x, y, radius);
     this.vertex = v;
     this.adjVerteices = new HashSet<>();
     this.styleProxy = new StyleProxy(this);
     styleProxy.addStyleClass("vertex");
+
+    if (allowMove) {
+      enableDrag();
+    }
   }
 
   public boolean addAdjacentVertex(VertexView v) {
@@ -47,6 +53,9 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
   }
 
   public void setPosition(double x, double y) {
+    if (isDragging) {
+      return;
+    }
     setCenterX(x);
     setCenterY(y);
   }
@@ -107,13 +116,59 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
 
   private double boundCenterCoordinate(double value, double min, double max) {
     double radius = getRadius();
-    if (value < min - radius) {
-      return min - radius;
+    if (value < min + radius) {
+      return min + radius;
     } else if (value > max - radius) {
       return max - radius;
     } else {
       return value;
     }
+  }
+
+  private void enableDrag() {
+    PointVector dragDelta = new PointVector(0, 0);
+
+    setOnMousePressed((mouseEvent) -> {
+      if (mouseEvent.isPrimaryButtonDown()) {
+        dragDelta.x = getCenterX() - mouseEvent.getX();
+        dragDelta.y = getCenterY() - mouseEvent.getY();
+        getScene().setCursor(Cursor.MOVE);
+        isDragging = true;
+
+        mouseEvent.consume();
+      }
+    });
+
+    setOnMouseReleased((mouseEvent) -> {
+      getScene().setCursor(Cursor.HAND);
+      isDragging = false;
+
+      mouseEvent.consume();
+    });
+
+    setOnMouseDragged((mouseEvent) -> {
+      if (mouseEvent.isPrimaryButtonDown()) {
+        double newX = mouseEvent.getX() + dragDelta.x;
+        double x = boundCenterCoordinate(newX, 0, getParent().getLayoutBounds().getWidth());
+        double newY = mouseEvent.getY() + dragDelta.y;
+        double y = boundCenterCoordinate(newY, 0, getParent().getLayoutBounds().getHeight());
+        setCenterX(x);
+        setCenterY(y);
+        mouseEvent.consume();
+      }
+    });
+
+    setOnMouseEntered((mouseEvent) -> {
+      if (!mouseEvent.isPrimaryButtonDown()) {
+        getScene().setCursor(Cursor.HAND);
+      }
+    });
+
+    setOnMouseExited((mouseEvent) -> {
+      if (!mouseEvent.isPrimaryButtonDown()) {
+        getScene().setCursor(Cursor.DEFAULT);
+      }
+    });
   }
 
   private class PointVector {

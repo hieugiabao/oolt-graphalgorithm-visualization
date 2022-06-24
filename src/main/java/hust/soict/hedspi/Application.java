@@ -49,5 +49,7 @@ public class Application extends javafx.application.Application {
 		stage.show();
 
 		graphView.init();
+
+		// graphView.setAutomaticLayout(false);
 	}
 }
