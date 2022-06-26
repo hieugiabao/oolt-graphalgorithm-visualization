@@ -1,11 +1,15 @@
 package hust.soict.hedspi.view;
 
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import hust.soict.hedspi.annotation.LabelSource;
 import hust.soict.hedspi.model.graph.BaseGraph;
@@ -23,6 +27,8 @@ import javafx.scene.layout.Pane;
 import static hust.soict.hedspi.utils.Utilities.*;
 
 public class GraphPanel extends Pane {
+  private final Logger logger = LogManager.getLogger(GraphPanel.class);
+
   private final BaseGraph<?> graph;
   private final Map<Vertex, VertexView> vertexNodes;
   private final Map<Edge, BaseEdgeView> edgeNodes;
@@ -122,7 +128,6 @@ public class GraphPanel extends Pane {
       updateForces();
     }
     applyForces();
-    // System.out.println("update");
   }
 
   private void applyForces() {
@@ -188,7 +193,7 @@ public class GraphPanel extends Pane {
       this.getStyleClass().add("graph");
     } catch (Exception e) {
       // TODO: handle exception
-      System.out.println(e.getMessage());
+      logger.error("Error loading stylesheet", e);
     }
   }
 
@@ -222,7 +227,6 @@ public class GraphPanel extends Pane {
       // create curve edge
       if (edgeNodes.get(new DirectedEdge(edge.getTarget(), edge.getSource())) != null) {
         edgeView = new EdgeViewCurve(edge, vertexInView, vertexOutView, true);
-        // System.out.println("co");
       } else
         edgeView = new EdgeViewCurve(edge, vertexInView, vertexOutView);
     } else {
@@ -255,8 +259,8 @@ public class GraphPanel extends Pane {
           return value.toString();
         }
       }
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
+    } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      logger.error("Error generating vertex label", ex);
     }
 
     return v != null ? v.toString() : "NULL";
@@ -272,8 +276,8 @@ public class GraphPanel extends Pane {
           return value.toString();
         }
       }
-    } catch (Exception ex) {
-      System.out.println(ex.getMessage());
+    } catch (SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+      logger.error("Error generating edge label", ex);
     }
 
     return e != null ? e.toString() : "NULL";

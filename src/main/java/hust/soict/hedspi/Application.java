@@ -1,5 +1,8 @@
 package hust.soict.hedspi;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import hust.soict.hedspi.model.algo.spanning.Prim;
 import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.DirectedGraph;
@@ -19,6 +22,8 @@ import javafx.stage.StageStyle;
  *
  */
 public class Application extends javafx.application.Application {
+	private static final Logger logger = LogManager.getLogger(Application.class);
+
 	public static void main(String[] args) {
 
 		/*
@@ -41,7 +46,7 @@ public class Application extends javafx.application.Application {
 		// TODO Auto-generated method stub
 
 		UndirectedGraph graph = TypeUtil.uncheckedCast(BaseGraph.Rail());
-		PlacementStrategy stategy = new CircularPlacementStrategy();
+		// PlacementStrategy stategy = new CircularPlacementStrategy();
 		GraphPanel graphView = new GraphPanel(graph);
 
 		Scene scene = new Scene(new GraphContainer(graphView), 800, 600);
@@ -50,8 +55,9 @@ public class Application extends javafx.application.Application {
 		stage.setTitle("Graph View");
 		stage.setScene(scene);
 		stage.show();
-
+		System.out.println("");
 		graphView.init();
+		logger.info("Graph view initialized");
 
 		// graphView.setAutomaticLayout(false);
 	}
