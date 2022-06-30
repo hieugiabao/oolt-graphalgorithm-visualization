@@ -28,10 +28,10 @@ public class EdgeViewLine extends Line implements BaseEdgeView {
     styleProxy = new StyleProxy(this);
     styleProxy.addStyleClass("edge");
 
-    startXProperty().bind(target.centerXProperty());
-    startYProperty().bind(target.centerYProperty());
-    endXProperty().bind(source.centerXProperty());
-    endYProperty().bind(source.centerYProperty());
+    startXProperty().bind(source.centerXProperty());
+    startYProperty().bind(source.centerYProperty());
+    endXProperty().bind(target.centerXProperty());
+    endYProperty().bind(target.centerYProperty());
   }
 
   @Override
