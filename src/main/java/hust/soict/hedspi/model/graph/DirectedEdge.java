@@ -48,6 +48,6 @@ public class DirectedEdge extends Edge {
 
   @Override
   public String toString() {
-    return "(" + source + " -> " + target + ")";
+    return "(" + source + " -> " + target + ", " + getWeight() + ")";
   }
 }

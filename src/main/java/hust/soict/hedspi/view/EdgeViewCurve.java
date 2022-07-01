@@ -42,6 +42,7 @@ public class EdgeViewCurve extends CubicCurve implements BaseEdgeView {
 
     angleFactor = haveReverseEdge ? 1 : 0;
 
+    update();
     enableListeners();
   }
 

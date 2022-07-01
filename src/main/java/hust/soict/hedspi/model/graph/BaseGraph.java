@@ -1,6 +1,7 @@
 package hust.soict.hedspi.model.graph;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -22,14 +23,14 @@ public abstract class BaseGraph<E extends Edge> {
 
   public Set<Vertex> vertexSet() {
     if (unmodifiableVertexSet == null) {
-      unmodifiableVertexSet = new HashSet<>(vertices);
+      unmodifiableVertexSet = Collections.unmodifiableSet(vertices);
     }
     return unmodifiableVertexSet;
   }
 
   public Set<E> edgeSet() {
     if (unmodifiableEdgeSet == null) {
-      unmodifiableEdgeSet = new HashSet<>(edges);
+      unmodifiableEdgeSet = Collections.unmodifiableSet(edges);
     }
     return unmodifiableEdgeSet;
   }
@@ -98,12 +99,19 @@ public abstract class BaseGraph<E extends Edge> {
     return e.getWeight();
   }
 
-  public void setWeight(E e, double weight) {
+  public <E extends Edge> void setWeight(E e, double weight) {
     if (type.isWeighted() == false) {
       throw new UnsupportedOperationException("Graph is not weighted");
     } else {
-      e.setWeight(weight);
+      edges.forEach(edge -> {
+        if (edge.equals(e))
+          edge.setWeight(weight);
+      });
     }
+  }
+
+  public boolean isEmpty() {
+    return vertices.isEmpty();
   }
 
   public abstract Set<E> incomingEdgesOf(Vertex v);

@@ -79,6 +79,6 @@ public class Edge implements Comparable<Edge> {
 
   @Override
   public String toString() {
-    return "(" + source + " -- " + target + ")";
+    return "(" + source + " -- " + target + ", " + getWeight() + ")";
   }
 }

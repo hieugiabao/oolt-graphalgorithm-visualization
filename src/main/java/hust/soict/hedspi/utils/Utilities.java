@@ -63,4 +63,9 @@ public class Utilities {
 
     return result;
   }
+
+  public static boolean checkInCircle(Point2D point, Point2D center, double radius) {
+    double distance = point.distance(center);
+    return distance <= radius;
+  }
 }
