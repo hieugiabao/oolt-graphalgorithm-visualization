@@ -99,7 +99,7 @@ public abstract class BaseGraph<E extends Edge> {
     return e.getWeight();
   }
 
-  public <E extends Edge> void setWeight(E e, double weight) {
+  public void setWeight(Edge e, double weight) {
     if (type.isWeighted() == false) {
       throw new UnsupportedOperationException("Graph is not weighted");
     } else {

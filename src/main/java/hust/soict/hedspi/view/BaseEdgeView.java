@@ -1,5 +1,6 @@
 package hust.soict.hedspi.view;
 
+import hust.soict.hedspi.model.algo.step.State;
 import hust.soict.hedspi.model.graph.Edge;
 
 public interface BaseEdgeView extends LabeledNode, StylableNode {
@@ -8,4 +9,8 @@ public interface BaseEdgeView extends LabeledNode, StylableNode {
   public Arrow getAttatchedArrow();
 
   public void attachArrow(Arrow arrow);
+
+  public Label getAttachedLabel();
+
+  public void setState(State.EdgeState state);
 }

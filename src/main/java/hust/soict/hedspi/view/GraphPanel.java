@@ -2,6 +2,7 @@ package hust.soict.hedspi.view;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,18 +13,26 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import hust.soict.hedspi.annotation.LabelSource;
+import hust.soict.hedspi.model.algo.step.State;
+import hust.soict.hedspi.model.algo.step.State.EdgeState;
+import hust.soict.hedspi.model.algo.step.State.VertexState;
 import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.DirectedEdge;
 import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
 import hust.soict.hedspi.utils.TypeUtil;
 import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
+import javafx.geometry.BoundingBox;
+import javafx.geometry.Bounds;
 import javafx.geometry.Point2D;
 import javafx.scene.Node;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.Pane;
+import javafx.scene.text.Text;
+
 import static hust.soict.hedspi.utils.Utilities.*;
 
 public class GraphPanel extends Pane {
@@ -38,8 +47,9 @@ public class GraphPanel extends Pane {
   private final BooleanProperty automaticLayout;
   private AnimationTimer timer;
   private boolean initialized = false;
+  private State state;
 
-  public GraphPanel(BaseGraph<?> graph, PlacementStrategy placementStrategy) {
+  public GraphPanel(BaseGraph<? extends Edge> graph, PlacementStrategy placementStrategy, State state) {
     if (graph == null)
       throw new IllegalArgumentException("Graph cannot be null");
     this.graph = graph;
@@ -54,6 +64,8 @@ public class GraphPanel extends Pane {
     edgeNodes = new HashMap<>();
 
     loadStylesheet();
+
+    this.state = state == null ? createDefaultState() : state;
 
     initNodes();
 
@@ -74,8 +86,12 @@ public class GraphPanel extends Pane {
     });
   }
 
+  public GraphPanel(BaseGraph<? extends Edge> graph, PlacementStrategy placementStrategy) {
+    this(graph, placementStrategy, null);
+  }
+
   public GraphPanel(BaseGraph<?> graph) {
-    this(graph, null);
+    this(graph, null, null);
   }
 
   public BooleanProperty automaticLayoutProperty() {
@@ -109,7 +125,6 @@ public class GraphPanel extends Pane {
 
         BaseEdgeView edgeView = createEdge(edge, vertexView, oppositeVertexView);
         addEdge(edgeView, edge);
-
         edgesToPlace.remove(edge);
       }
     }
@@ -119,6 +134,8 @@ public class GraphPanel extends Pane {
       VertexView vertexView = vertexNodes.get(vertex);
       addVertex(vertexView);
     }
+
+    updateState();
   }
 
   private synchronized void runLayoutIteration() {
@@ -297,5 +314,239 @@ public class GraphPanel extends Pane {
     placementStrategy.place(widthProperty().doubleValue(), heightProperty().doubleValue(), graph, vertexNodes.values());
     timer.start();
     this.initialized = true;
+  }
+
+  private State createDefaultState() {
+    List<Vertex> vertexList = new LinkedList<>(graph.vertexSet());
+    List<Edge> edgeList = new LinkedList<>(graph.edgeSet());
+    return new State(vertexList, edgeList, new LinkedList<Vertex>(), new LinkedList<Edge>(), new LinkedList<Vertex>(),
+        new LinkedList<Edge>(), new LinkedList<Edge>());
+  }
+
+  private synchronized void updateNodes() {
+    removeNodes();
+    insertNodes();
+  }
+
+  private void insertNodes() {
+    Collection<Vertex> unplottedVertices = unplottedVertices();
+    List<VertexView> newVertices = null;
+
+    Bounds bounds = getPlotBounds();
+    double midX = bounds.getMinX() + bounds.getWidth() / 2;
+    double midY = bounds.getMinY() + bounds.getHeight() / 2;
+
+    if (!unplottedVertices.isEmpty()) {
+      newVertices = new LinkedList<>();
+      for (Vertex vertex : unplottedVertices) {
+        double x, y;
+        Set<Edge> adjSet = TypeUtil.uncheckedCast(graph.edgesOf(vertex));
+        if (adjSet.isEmpty()) {
+          x = midX;
+          y = midY;
+        } else {
+          Edge firstEdge = adjSet.iterator().next();
+          Vertex oppositeVertex = firstEdge.getOppositeVertex(vertex);
+          VertexView existing = vertexNodes.get(oppositeVertex);
+          if (existing == null) {
+            x = midX;
+            y = midY;
+          } else {
+            Point2D p = rotate(existing.getPosition().add(50.0, 50.0), existing.getPosition(), Math.random() * 360);
+            x = p.getX();
+            y = p.getY();
+          }
+        }
+
+        VertexView newVertex = new VertexView(vertex, x, y, 15, true);
+        newVertices.add(newVertex);
+        vertexNodes.put(vertex, newVertex);
+      }
+    }
+
+    Collection<Edge> unplottedEdges = unplottedEdges();
+    if (!unplottedEdges.isEmpty()) {
+      for (Edge edge : unplottedEdges) {
+        VertexView source = vertexNodes.get(edge.getSource());
+        VertexView target = vertexNodes.get(edge.getTarget());
+
+        if (source == null || target == null)
+          continue;
+
+        source.addAdjacentVertex(target);
+        target.addAdjacentVertex(source);
+
+        BaseEdgeView graphEdge = createEdge(edge, source, target);
+        if (this.edgesWithArrows) {
+          Arrow arrow = new Arrow(5);
+          graphEdge.attachArrow(arrow);
+          this.getChildren().add(arrow);
+        }
+        addEdge(graphEdge, edge);
+      }
+    }
+
+    if (newVertices != null) {
+      newVertices.forEach(v -> addVertex(v));
+    }
+  }
+
+  private void removeNodes() {
+    Collection<Edge> removedEdges = removedEdges();
+    removedEdges.forEach(edge -> {
+      BaseEdgeView ev = edgeNodes.remove(edge);
+      removeEdge(ev);
+
+      if (getTotalEdgeBetween(edge.getSource(), edge.getTarget()) == 0) {
+        VertexView v0 = vertexNodes.get(edge.getSource());
+        VertexView v1 = vertexNodes.get(edge.getTarget());
+
+        v1.removeAdjacentVertex(v0);
+        v0.removeAdjacentVertex(v1);
+      }
+    });
+
+    Collection<Vertex> removedVertices = removedVertices();
+    removedVertices.forEach(vertex -> {
+      VertexView vv = vertexNodes.remove(vertex);
+      removeVertex(vv);
+    });
+
+  }
+
+  private Collection<Edge> removedEdges() {
+    List<Edge> removed = new LinkedList<>();
+
+    Collection<BaseEdgeView> plotted = edgeNodes.values();
+    plotted.forEach(e -> {
+      if (!graph.edgeSet().contains(e.getEdge())) {
+        removed.add(e.getEdge());
+      }
+    });
+    return removed;
+  }
+
+  private Collection<Vertex> removedVertices() {
+    List<Vertex> removed = new LinkedList<>();
+
+    Collection<VertexView> plotted = vertexNodes.values();
+    plotted.forEach(v -> {
+      if (!graph.vertexSet().contains(v.getVertex()))
+        removed.add(v.getVertex());
+    });
+
+    return removed;
+  }
+
+  private Collection<Vertex> unplottedVertices() {
+    List<Vertex> unplotted = new LinkedList<>();
+    graph.vertexSet().forEach(v -> {
+      if (!vertexNodes.containsKey(v)) {
+        unplotted.add(v);
+      }
+    });
+    return unplotted;
+  }
+
+  private Collection<Edge> unplottedEdges() {
+    List<Edge> unplotted = new LinkedList<>();
+    graph.edgeSet().forEach(e -> {
+      if (!edgeNodes.containsKey(e)) {
+        unplotted.add(e);
+      }
+    });
+    return unplotted;
+  }
+
+  private void removeEdge(BaseEdgeView e) {
+    getChildren().remove((Node) e);
+
+    Arrow attachedArrow = e.getAttatchedArrow();
+    if (attachedArrow != null) {
+      getChildren().remove(attachedArrow);
+    }
+
+    Text attachLabel = e.getAttachedLabel();
+    if (attachLabel != null) {
+      getChildren().remove(attachLabel);
+    }
+  }
+
+  private void removeVertex(VertexView v) {
+    getChildren().remove(v);
+
+    Text attachedLabel = v.getAttachedLabel();
+    if (attachedLabel != null) {
+      getChildren().remove(attachedLabel);
+    }
+  }
+
+  private int getTotalEdgeBetween(Vertex v, Vertex u) {
+    int count = 0;
+    for (Edge e : graph.edgeSet()) {
+      if ((e.getTarget().equals(v) && e.getSource().equals(u))
+          || (e.getTarget().equals(u) && e.getSource().equals(v))) {
+        count++;
+      }
+    }
+    return count;
+  }
+
+  private Bounds getPlotBounds() {
+    double minX = Double.MAX_VALUE, minY = Double.MAX_VALUE,
+        maxX = Double.MIN_VALUE, maxY = Double.MIN_VALUE;
+
+    if (vertexNodes.size() == 0)
+      return new BoundingBox(0, 0, getWidth(), getHeight());
+    for (VertexView v : vertexNodes.values()) {
+      minX = Math.min(minX, v.getCenterX());
+      minY = Math.min(minY, v.getCenterY());
+      maxX = Math.max(maxX, v.getCenterX());
+      maxY = Math.max(maxY, v.getCenterY());
+    }
+
+    return new BoundingBox(minX, minY, maxX - minX, maxY - minY);
+  }
+
+  private void updateState() {
+    Map<Vertex, VertexState> vertexStateMap = state.getVertexStateMap();
+    Map<Edge, EdgeState> edgeStateMap = state.getEdgeStateMap();
+
+    for (Vertex v : vertexStateMap.keySet()) {
+      VertexView vv = vertexNodes.get(v);
+      if (vv == null)
+        continue;
+
+      VertexState state = vertexStateMap.get(v);
+      vv.setState(state);
+    }
+
+    for (Edge e : edgeStateMap.keySet()) {
+      BaseEdgeView ev = edgeNodes.get(e);
+      if (ev == null)
+        continue;
+
+      EdgeState state = edgeStateMap.get(e);
+      ev.setState(state);
+    }
+  }
+
+  public void update() {
+    if (this.getScene() == null) {
+      throw new IllegalStateException("You must call this method after the instance was added to a scene.");
+    }
+
+    if (!this.initialized) {
+      throw new IllegalStateException("You must call init() before calling update().");
+    }
+
+    Platform.runLater(() -> {
+      updateNodes();
+    });
+  }
+
+  public void setState(State newState) {
+    this.state = newState;
+    updateState();
   }
 }

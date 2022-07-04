@@ -217,7 +217,6 @@ public class DrawGraphController {
           return;
         }
         BaseEdgeView edgeView = createEdgeView(edge, source, target);
-        logger.info("{}", edgeView);
         edgeViewMap.put(edge, edgeView);
         canvas.getChildren().add((Node) edgeView);
         if (isWeighted) {
@@ -243,7 +242,7 @@ public class DrawGraphController {
             canvas.getChildren().add(label);
             weightInfoController.weightProperty.addListener((ov, oldValue, newValue) -> {
               label.setText(newValue + "");
-              graph.<Edge>setWeight(edge, (double) newValue);
+              graph.setWeight(edge, (double) newValue);
             });
           } catch (IOException e) {
             // TODO: handle exception
@@ -305,8 +304,6 @@ public class DrawGraphController {
     Point2D end = new Point2D(target.getCenterX(), target.getCenterY());
     borderPane.setPrefSize(end.distance(start), RADIUS * 2);
     Rotate rotate = new Rotate();
-    rotate.setPivotX(end.getX());
-    rotate.setPivotY(end.getY());
     rotate.setAngle(Math.toDegrees(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX())));
     borderPane.getTransforms().add(rotate);
     borderPane.setOnMousePressed(ev -> {

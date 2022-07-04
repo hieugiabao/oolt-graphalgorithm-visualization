@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import hust.soict.hedspi.model.algo.step.State;
 import hust.soict.hedspi.model.graph.Vertex;
 import javafx.geometry.Point2D;
 import javafx.scene.Cursor;
@@ -16,11 +17,12 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
   private final StyleProxy styleProxy;
   private Label attachedLabel = null;
   private boolean isDragging = false;
+  private State.VertexState state;
 
   private final PointVector forceVector = new PointVector(0, 0);
   private final PointVector updatedPosition = new PointVector(0, 0);
 
-  public VertexView(Vertex v, double x, double y, double radius, boolean allowMove) {
+  public VertexView(Vertex v, double x, double y, double radius, boolean allowMove, State.VertexState state) {
     super(x, y, radius);
     this.vertex = v;
     this.adjVerteices = new HashSet<>();
@@ -30,6 +32,13 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
     if (allowMove) {
       enableDrag();
     }
+
+    this.state = state != null ? state : new State.VertexState(this.vertex, State.VERTEX_STATE.DEFAULT);
+    updateState();
+  }
+
+  public VertexView(Vertex v, double x, double y, double radius, boolean allowMove) {
+    this(v, x, y, radius, allowMove, null);
   }
 
   public boolean addAdjacentVertex(VertexView v) {
@@ -76,7 +85,7 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
   }
 
   @Override
-  public StylableNode getAttachedLabel() {
+  public Label getAttachedLabel() {
     return attachedLabel;
   }
 
@@ -196,5 +205,61 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
   public boolean removeStyleClass(String cssClass) {
     // TODO Auto-generated method stub
     return styleProxy.removeStyleClass(cssClass);
+  }
+
+  public void setState(State.VertexState state) {
+    if (!this.state.equals(state)) {
+      this.state = state;
+      updateState();
+    }
+  }
+
+  private void updateState() {
+    if (state == null)
+      return;
+    switch (state.getState()) {
+      case DEFAULT:
+        removeStyleClass("vertex-highlighted");
+        removeStyleClass("vertex-unqueued");
+        removeStyleClass("vertex-traversed");
+        if (attachedLabel != null) {
+          attachedLabel.removeStyleClass("vertex-label-highlighted");
+          attachedLabel.removeStyleClass("vertex-label-unqueued");
+          attachedLabel.removeStyleClass("vertex-label-traversed");
+        }
+        break;
+      case HIGHLIGHTED:
+        removeStyleClass("vertex-unqueued");
+        removeStyleClass("vertex-traversed");
+        addStyleClass("vertex-highlighted");
+        if (attachedLabel != null) {
+          attachedLabel.removeStyleClass("vertex-label-unqueued");
+          attachedLabel.removeStyleClass("vertex-label-traversed");
+          attachedLabel.addStyleClass("vertex-label-highlighted");
+        }
+        break;
+      case UNQUEUED:
+        removeStyleClass("vertex-highlighted");
+        removeStyleClass("vertex-traversed");
+        addStyleClass("vertex-unqueued");
+        if (attachedLabel != null) {
+          attachedLabel.removeStyleClass("vertex-label-highlighted");
+          attachedLabel.removeStyleClass("vertex-label-traversed");
+          attachedLabel.addStyleClass("vertex-label-unqueued");
+        }
+        break;
+      case TRAVERSED:
+        removeStyleClass("vertex-unqueued");
+        removeStyleClass("vertex-highlighted");
+        addStyleClass("vertex-traversed");
+        if (attachedLabel != null) {
+          attachedLabel.removeStyleClass("vertex-label-highlighted");
+          attachedLabel.removeStyleClass("vertex-label-unqueued");
+          attachedLabel.addStyleClass("vertex-label-traversed");
+        }
+        break;
+      default:
+        break;
+    }
   }
 }

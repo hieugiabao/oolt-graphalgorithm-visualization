@@ -5,6 +5,11 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import hust.soict.hedspi.model.graph.BaseGraph;
+import hust.soict.hedspi.model.graph.DirectedGraph;
+import hust.soict.hedspi.model.graph.UndirectedGraph;
+import hust.soict.hedspi.view.GraphPanel;
+import hust.soict.hedspi.view.container.GraphContainer;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -44,35 +49,16 @@ public class Application extends javafx.application.Application {
 	public void start(Stage primaryStage) {
 		// TODO Auto-generated method stub
 
-		/*
-		 * UndirectedGraph graph = TypeUtil.uncheckedCast(BaseGraph.Rail());
-		 * // PlacementStrategy stategy = new CircularPlacementStrategy();
-		 * GraphPanel graphView = new GraphPanel(graph);
-		 * GraphContainer container = new GraphContainer(graphView);
-		 * Scene scene = new Scene(container, 800, 600);
-		 * primaryStage.setScene(scene);
-		 * primaryStage.setTitle("Graph");
-		 * primaryStage.show();
-		 * graphView.init();
-		 * logger.info("Graph view initialized");
-		 */
-
-		try {
-			scene = new Scene(loadFXML("create-graph"));
-			stage = new Stage(StageStyle.DECORATED);
-			stage.setScene(scene);
-			stage.setTitle("Graph View");
-			stage.setScene(scene);
-			stage.show();
-
-			stage.setOnCloseRequest((WindowEvent t) -> {
-				Platform.exit();
-				System.exit(0);
-			});
-		} catch (IOException e) {
-			// TODO: handle exception
-			logger.error("Failed to load fxml file", e);
-		}
+		DirectedGraph graph = (DirectedGraph) BaseGraph.CP4414();
+		// PlacementStrategy stategy = new CircularPlacementStrategy();
+		GraphPanel graphView = new GraphPanel(graph);
+		GraphContainer container = new GraphContainer(graphView);
+		Scene scene = new Scene(container, 800, 600);
+		primaryStage.setScene(scene);
+		primaryStage.setTitle("Graph");
+		primaryStage.show();
+		graphView.init();
+		logger.info("Graph view initialized");
 
 		/*
 		 * 

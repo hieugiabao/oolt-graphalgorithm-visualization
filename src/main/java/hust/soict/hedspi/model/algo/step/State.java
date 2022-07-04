@@ -8,8 +8,8 @@ import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
 
 public class State {
-  Map<Vertex, VertexState> vertexStateMap;
-  Map<Edge, EdgeState> edgeStateMap;
+  private Map<Vertex, VertexState> vertexStateMap;
+  private Map<Edge, EdgeState> edgeStateMap;
 
   public State(List<Vertex> vertexList, List<Edge> edgeList,
       List<Vertex> vertexHighlighted, List<Edge> edgeHighlighted,
@@ -21,11 +21,11 @@ public class State {
         && edgeTraversed == null && edgeQueued == null;
 
     for (Vertex v : vertexList) {
-      vertexStateMap.put(v, new VertexState(v, isDisable ? VERTEX_STATE.QUEUED : VERTEX_STATE.DEFAULT));
+      vertexStateMap.put(v, new VertexState(v, isDisable ? VERTEX_STATE.UNQUEUED : VERTEX_STATE.DEFAULT));
     }
 
     for (Edge e : edgeList) {
-      edgeStateMap.put(e, new EdgeState(e, isDisable ? EDGE_STATE.QUEUED : EDGE_STATE.DEFAULT));
+      edgeStateMap.put(e, new EdgeState(e, isDisable ? EDGE_STATE.UNQUEUED : EDGE_STATE.DEFAULT));
     }
 
     if (edgeQueued != null)
@@ -103,6 +103,8 @@ public class State {
           return false;
       } else if (!edge.equals(other.edge))
         return false;
+      if (state != other.state)
+        return false;
       return true;
     }
   }
@@ -150,6 +152,8 @@ public class State {
           return false;
       } else if (!vertex.equals(other.vertex))
         return false;
+      if (state != other.state)
+        return false;
       return true;
     }
   }
@@ -158,13 +162,22 @@ public class State {
     DEFAULT, // default state
     HIGHLIGHTED, // highlighted state
     TRAVERSED, // traversed state
-    QUEUED, // queued state
+    UNQUEUED, // queued state
   }
 
   public static enum EDGE_STATE {
     DEFAULT, // default state
     HIGHLIGHTED, // highlighted state
     TRAVERSED, // traversed state
-    QUEUED, // queued state
+    UNQUEUED, // queued state
+
+  }
+
+  public Map<Vertex, VertexState> getVertexStateMap() {
+    return vertexStateMap;
+  }
+
+  public Map<Edge, EdgeState> getEdgeStateMap() {
+    return edgeStateMap;
   }
 }
