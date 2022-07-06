@@ -323,8 +323,7 @@ public class GraphPanel extends Pane {
   private State createDefaultState() {
     List<Vertex> vertexList = new LinkedList<>(graph.vertexSet());
     List<Edge> edgeList = new LinkedList<>(graph.edgeSet());
-    return new State(vertexList, edgeList, new LinkedList<Vertex>(), new LinkedList<Edge>(), new LinkedList<Vertex>(),
-        new LinkedList<Edge>(), new LinkedList<Edge>());
+    return new State(vertexList, edgeList);
   }
 
   private synchronized void updateNodes() {

@@ -173,19 +173,25 @@ public class Prim extends SpanningTreeAlgorithm {
         status = "";
         for (Edge e : graph.edgesOf(v)) {
           Vertex q = e.getOppositeVertex(v);
+          if (treeVertexSet.contains(q)) {
+            continue;
+          }
           VertexInfo qInfo = new VertexInfo();
           qInfo.vertex = q;
           qInfo.distance = e.getWeight();
           qInfo.parentEdge = e;
-          pq.add(qInfo);
 
-          edgesQueued.add(e);
-          status += "(" + e.getWeight() + ", " + q.getId() + "), ";
+          if (!edgesQueued.contains(e)) {
+            edgesQueued.add(e);
+            status += "(" + e.getWeight() + ", " + q.getId() + "), ";
+            pq.add(qInfo);
+          }
         }
         state = new State(vertexList, edgeList, verticesHighlighted,
             edgesHighlighted, verticesTraversed, edgesTraversed, edgesQueued);
         status = v.getId() + " and this edge is added to T(weight of T = " + spanningWeight + " ), "
-            + status.substring(0, status.length() - 2) + " is also added to the PQ. \nThe PQ is now "
+            + (status.length() >= 2 ? status.substring(0, status.length() - 2) : "")
+            + " is also added to the PQ. \nThe PQ is now "
             + priorityQueueToString(pq);
         steps.add(new Step(state, status, 5));
       } else {

@@ -1,12 +1,15 @@
 package hust.soict.hedspi.controllers;
 
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.ResourceBundle;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import hust.soict.hedspi.model.algo.spanning.SpanningTreeAlgorithm;
+import hust.soict.hedspi.model.algo.step.State;
+import hust.soict.hedspi.model.algo.step.Step;
 import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.Edge;
 import hust.soict.hedspi.model.graph.Vertex;
@@ -88,5 +91,27 @@ public class MainController implements Initializable {
     Platform.runLater(() -> {
       graphPane.init();
     });
+  }
+
+  public void updateDisplay(Step step) {
+    updateGraphDisplay(step.getState());
+    updateDetailCodeDisplay(step.getStatus());
+    highlightPseudoCode(step.getLineNo());
+  }
+
+  private void updateGraphDisplay(State state) {
+    graphPane.setState(state);
+  }
+
+  private void updateDetailCodeDisplay(String detail) {
+    pseudoCodeController.setDetailCode(detail);
+  }
+
+  private void highlightPseudoCode(int[] lineNo) {
+    pseudoCodeController.highlightPseudoCode(lineNo);
+  }
+
+  public void clearDisplay() {
+    graphPane.setState(new State(new LinkedList<Vertex>(graph.vertexSet()), new LinkedList<Edge>(graph.edgeSet())));
   }
 }

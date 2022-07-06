@@ -17,8 +17,8 @@ public class State {
     vertexStateMap = new HashMap<Vertex, VertexState>();
     edgeStateMap = new HashMap<Edge, EdgeState>();
 
-    boolean isDisable = vertexHighlighted == null && edgeHighlighted == null && vertexTraversed == null
-        && edgeTraversed == null && edgeQueued == null;
+    boolean isDisable = !(vertexHighlighted == null && edgeHighlighted == null && vertexTraversed == null
+        && edgeTraversed == null && edgeQueued == null);
 
     for (Vertex v : vertexList) {
       vertexStateMap.put(v, new VertexState(v, isDisable ? VERTEX_STATE.UNQUEUED : VERTEX_STATE.DEFAULT));

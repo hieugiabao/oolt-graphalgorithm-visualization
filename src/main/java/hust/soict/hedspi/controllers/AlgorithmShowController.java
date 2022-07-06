@@ -25,6 +25,11 @@ public class AlgorithmShowController {
   @FXML
   private void initialize() {
     detailShow.setText("");
+    detailShow.setPrefWidth(250);
+    detailShow.setStyle("-fx-font-size: 14;-fx-word-wrap: break-word;");
+    detailShow.setPadding(new Insets(5, 0, 0, 4));
+    detailShow.setWrapText(true);
+    detailShow.maxWidthProperty().bind(pseudoCode.widthProperty());
 
     Platform.runLater(() -> {
       mainController.algoDisableProperty.addListener((ov, oldValue, newValue) -> {
@@ -53,6 +58,24 @@ public class AlgorithmShowController {
 
       pseudoLabelMap.put(i, label);
       pseudoCode.getChildren().add(label);
+    }
+  }
+
+  public void setDetailCode(String detail) {
+    detailShow.setText(detail);
+  }
+
+  public void highlightPseudoCode(int[] lineNo) {
+    resetPseudoCodeCss();
+    for (int i = 0; i < lineNo.length; i++) {
+      pseudoLabelMap.get(lineNo[i]).setStyle(
+          "-fx-font-size: 14;-fx-word-wrap: break-word;-fx-font-weight: bold; -fx-background-color: #333; -fx-text-fill: #eee;");
+    }
+  }
+
+  private void resetPseudoCodeCss() {
+    for (Label label : pseudoLabelMap.values()) {
+      label.setStyle("-fx-font-size: 14;-fx-word-wrap: break-word;");
     }
   }
 }
