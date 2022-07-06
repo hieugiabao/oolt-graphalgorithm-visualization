@@ -60,7 +60,6 @@ public class DrawGraphController {
   private BaseGraph<? extends Edge> graph;
   private Map<Vertex, VertexView> vertexViewMap = new LinkedHashMap<>();
   private Map<Edge, BaseEdgeView> edgeViewMap = new LinkedHashMap<>();
-  private Map<Edge, Arrow> arrowMap = new LinkedHashMap<>();
   private BooleanProperty empty;
   private Line l;
   private Arrow arrow;
@@ -100,6 +99,29 @@ public class DrawGraphController {
     doneButton.disableProperty().bind(haveGraph);
 
     canvas.setOnMousePressed(e -> {
+      createVertex(e);
+    });
+
+    previousButton.onMouseClickedProperty().set(e -> {
+      logger.debug("Previous button clicked");
+      mainController.toInfoGraph();
+    });
+
+    cancelButton.onMouseClickedProperty().set(e -> {
+      logger.debug("Cancel button clicked");
+      this.graph = null;
+      cancelButton.getScene().getWindow().hide();
+    });
+
+    doneButton.onMouseClickedProperty().set(e -> {
+      logger.info("graph finished: {}, {}", graph.vertexSet(), graph.edgeSet());
+      mainController.setGraph(graph);
+      root.getScene().getWindow().hide();
+    });
+  }
+
+  private void createVertex(MouseEvent e) {
+    if (e.isPrimaryButtonDown()) {
       Vertex vertex = new Vertex(id);
       double x, y;
       if (e.getX() < RADIUS)
@@ -127,17 +149,7 @@ public class DrawGraphController {
       empty.set(false);
 
       canvas.getChildren().addAll(borderPane, vertexView, label);
-
-      ObservableList<Node> workingCollection = FXCollections.observableArrayList(canvas.getChildren());
-      // sort by BorderPane ascending
-      Collections.sort(workingCollection, (n1, n2) -> {
-        if (n1 instanceof BorderPane && !(n2 instanceof BorderPane))
-          return -1;
-        else if (n2 instanceof BorderPane && !(n1 instanceof BorderPane))
-          return 1;
-        return 0;
-      });
-      canvas.getChildren().setAll(workingCollection);
+      borderPaneToBack();
 
       logger.info("vertex added to graph: {}", vertex);
       vertexView.setOnMousePressed(ev -> {
@@ -180,21 +192,7 @@ public class DrawGraphController {
         ev.consume();
       });
       id++;
-    });
-
-    previousButton.onMouseClickedProperty().set(e -> {
-      logger.debug("Previous button clicked");
-      mainController.toInfoGraph();
-    });
-
-    cancelButton.onMouseClickedProperty().set(e -> {
-      logger.debug("Cancel button clicked");
-      cancelButton.getScene().getWindow().hide();
-    });
-
-    doneButton.onMouseClickedProperty().set(e -> {
-      logger.info("graph finished: {}, {}", graph.vertexSet(), graph.edgeSet());
-    });
+    }
   }
 
   private void drawLine(MouseEvent ev) {
@@ -277,13 +275,19 @@ public class DrawGraphController {
       } else {
         Edge reverseEdge = new DirectedEdge(target.getVertex(), source.getVertex());
         if (edgeViewMap.containsKey(reverseEdge)) {
-          canvas.getChildren().removeAll((Node) edgeViewMap.get(reverseEdge), arrowMap.get(reverseEdge));
+          BaseEdgeView preEdgeView = edgeViewMap.get(reverseEdge);
+          canvas.getChildren().removeAll((Node) preEdgeView, preEdgeView.getAttachedLabel(),
+              preEdgeView.getAttatchedArrow());
           BaseEdgeView reverseEdgeView = new EdgeViewCurve(reverseEdge, target, source);
           canvas.getChildren().add((Node) reverseEdgeView);
           Arrow arrow = new Arrow(5);
           reverseEdgeView.attachArrow(arrow);
           canvas.getChildren().add(arrow);
-          arrowMap.put(reverseEdge, arrow);
+          if (isWeighted) {
+            Label label = new Label(edge.getWeight() + "");
+            reverseEdgeView.attachLabel(label);
+            canvas.getChildren().add(label);
+          }
           edgeView = new EdgeViewCurve(edge, source, target, true);
         } else {
           edgeView = new EdgeViewLine(edge, source, target);
@@ -292,7 +296,6 @@ public class DrawGraphController {
       Arrow arrow = new Arrow(5);
       edgeView.attachArrow(arrow);
       canvas.getChildren().add(arrow);
-      arrowMap.put(edge, arrow);
     } else {
       edgeView = new EdgeViewLine(edge, source, target);
     }
@@ -310,7 +313,10 @@ public class DrawGraphController {
       logger.info("consume");
       ev.consume();
     });
-    canvas.getChildren().add(borderPane);
+    if (edgeView instanceof EdgeViewLine) {
+      canvas.getChildren().add(borderPane);
+      borderPaneToBack();
+    }
     return edgeView;
   }
 
@@ -319,8 +325,20 @@ public class DrawGraphController {
     graph = null;
     vertexViewMap = new LinkedHashMap<>();
     edgeViewMap = new LinkedHashMap<>();
-    arrowMap = new LinkedHashMap<>();
     canvas.getChildren().removeIf((node) -> true);
+  }
+
+  private void borderPaneToBack() {
+    ObservableList<Node> workingCollection = FXCollections.observableArrayList(canvas.getChildren());
+    // sort by BorderPane ascending
+    Collections.sort(workingCollection, (n1, n2) -> {
+      if (n1 instanceof BorderPane && !(n2 instanceof BorderPane))
+        return -1;
+      else if (n2 instanceof BorderPane && !(n1 instanceof BorderPane))
+        return 1;
+      return 0;
+    });
+    canvas.getChildren().setAll(workingCollection);
   }
 
   public void show() {

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.Pane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane fx:id="root" maxHeight="-Infinity" maxWidth="500.0" minHeight="-Infinity" minWidth="0.0" prefHeight="600.0" prefWidth="200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hust.soict.hedspi.controllers.AlgorithmShowController">
+   <children>
+      <Label layoutX="-1.0" layoutY="-1.0" prefHeight="24.0" prefWidth="200.0" style="-fx-background-color: #969696;" text="  DETAIL" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <Pane layoutY="24.0" prefHeight="196.0" prefWidth="200.0" style="-fx-background-color: #F2F2F2;" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="24.0">
+         <children>
+            <Label fx:id="detailShow" layoutX="8.0" layoutY="14.0" />
+         </children>
+      </Pane>
+      <Label layoutY="220.0" prefHeight="24.0" prefWidth="200.0" style="-fx-background-color: #969696;" text="  PSEUDO CODE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="220.0">
+         <font>
+            <Font name="System Bold" size="13.0" />
+         </font>
+      </Label>
+      <VBox fx:id="pseudoCode" layoutY="244.0" prefHeight="356.0" prefWidth="200.0" style="-fx-background-color: #F1F1F1;" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="244.0" />
+   </children>
+</AnchorPane>

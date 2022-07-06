@@ -42,6 +42,7 @@ public class GraphPanel extends Pane {
   private final Map<Vertex, VertexView> vertexNodes;
   private final Map<Edge, BaseEdgeView> edgeNodes;
   private final boolean edgesWithArrows;
+  private final boolean edgesWithLabels;
   private final PlacementStrategy placementStrategy;
 
   private final BooleanProperty automaticLayout;
@@ -54,6 +55,7 @@ public class GraphPanel extends Pane {
       throw new IllegalArgumentException("Graph cannot be null");
     this.graph = graph;
     this.edgesWithArrows = graph.getType().isDirected();
+    this.edgesWithLabels = graph.getType().isWeighted();
 
     if (placementStrategy == null)
       this.placementStrategy = new RandomPlacementStrategy();
@@ -123,7 +125,7 @@ public class GraphPanel extends Pane {
         vertexView.addAdjacentVertex(oppositeVertexView);
         oppositeVertexView.addAdjacentVertex(vertexView);
 
-        BaseEdgeView edgeView = createEdge(edge, vertexView, oppositeVertexView);
+        BaseEdgeView edgeView = createEdge(edge, oppositeVertexView, vertexView);
         addEdge(edgeView, edge);
         edgesToPlace.remove(edge);
       }
@@ -187,7 +189,7 @@ public class GraphPanel extends Pane {
       if (!edgesOf) {
         Vertex find = vertexNodes.keySet().stream().filter(vertex -> {
           return !vertex.equals(v.getVertex()) && graph.edgesOf(vertex).size() > 0;
-        }).findFirst().get();
+        }).findFirst().orElse(null);
         if (find != null) {
           Point2D attractiveForce = attractiveForce(v.getUpdatedPosition(), vertexNodes.get(find).getUpdatedPosition(),
               30, 8);
@@ -205,7 +207,7 @@ public class GraphPanel extends Pane {
 
   private void loadStylesheet() {
     try {
-      String css = getClass().getResource("/css/app.css").toExternalForm();
+      String css = getClass().getResource("/css/graph.css").toExternalForm();
       getStylesheets().add(css);
       this.getStyleClass().add("graph");
     } catch (Exception e) {
@@ -224,10 +226,12 @@ public class GraphPanel extends Pane {
     Tooltip t = new Tooltip(labelText);
     Tooltip.install((Node) ev, t);
 
-    Label label = new Label(labelText);
-    label.getStyleClass().add("edge-label");
-    this.getChildren().add(label);
-    ev.attachLabel(label);
+    if (this.edgesWithLabels) {
+      Label label = new Label(labelText);
+      label.getStyleClass().add("edge-label");
+      this.getChildren().add(label);
+      ev.attachLabel(label);
+    }
 
     if (this.edgesWithArrows) {
       Arrow arrow = new Arrow(5);
@@ -377,11 +381,6 @@ public class GraphPanel extends Pane {
         target.addAdjacentVertex(source);
 
         BaseEdgeView graphEdge = createEdge(edge, source, target);
-        if (this.edgesWithArrows) {
-          Arrow arrow = new Arrow(5);
-          graphEdge.attachArrow(arrow);
-          this.getChildren().add(arrow);
-        }
         addEdge(graphEdge, edge);
       }
     }

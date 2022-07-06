@@ -1,11 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.SplitPane?>
+<?import javafx.scene.control.TreeView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.BorderPane?>
+<?import javafx.scene.layout.VBox?>
 
-
-<AnchorPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="422.0" prefWidth="630.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
-   <children>
-      <Button layoutX="258.0" layoutY="176.0" mnemonicParsing="false" prefHeight="70.0" prefWidth="114.0" text="create" />
-   </children>
-</AnchorPane>
+<VBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="600.0" prefWidth="1024" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hust.soict.hedspi.controllers.MainController">
+  <children>
+    <fx:include fx:id="menu" source="menu-bar.fxml" />
+    <fx:include fx:id="control" source="control.fxml" />
+    <SplitPane fx:id="main" dividerPositions="0.05, 0.8" prefHeight="496.0" prefWidth="1024">
+      <items>
+        <fx:include fx:id="hierarchy" source="graph-hierarchy.fxml" />
+        <BorderPane fx:id="container" prefHeight="600.0" prefWidth="824.0" />
+        <fx:include fx:id="pseudoCode" source="algo-show.fxml" />
+      </items>
+    </SplitPane>
+    <HBox fx:id="status" prefHeight="30.0" prefWidth="759.0" />
+  </children>
+</VBox>

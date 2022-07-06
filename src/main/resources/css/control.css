@@ -1,0 +1,103 @@
+* {
+  -fx-my-menu-color: #ddd;                  /* Change according to your needs */
+  -fx-my-menu-color-highlighted: #c3cacc;      /* Change according to your needs */
+  -fx-my-menu-font-color: #333;             /* Change according to your needs */
+  -fx-my-menu-font-color-highlighted: #444; /* Change according to your needs */
+}
+
+/* MENU BAR + Top-level MENU BUTTONS */
+/*** The menu bar itself ***/    
+.menu-bar {
+  -fx-background-color: -fx-my-menu-color;
+}
+
+/*** Top-level menu itself (not selected / hovered) ***/
+.menu-bar > .container > .menu-button {
+  -fx-background-color: -fx-my-menu-color;
+}
+
+/*** Top-level menu's label (not selected / hovered) ***/
+.menu-bar > .container > .menu-button > .label {
+  -fx-text-fill: -fx-my-menu-font-color;
+}
+
+/*** Top-level menu's label (disabled) ***/
+.menu-bar > .container > .menu-button > .label:disabled {
+  -fx-opacity: 1.0;
+}
+
+/*** Top-level menu itself (selected / hovered) ***/
+.menu-bar > .container > .menu-button:hover,
+.menu-bar > .container > .menu-button:focused,
+.menu-bar > .container > .menu-button:showing {
+  -fx-background-color: -fx-my-menu-color-highlighted;
+}
+
+/*** Top-level menu's label (selected / hovered) ***/
+.menu-bar > .container > .menu-button:hover > .label,
+.menu-bar > .container > .menu-button:focused > .label,
+.menu-bar > .container > .menu-button:showing > .label {
+  -fx-text-fill: -fx-my-menu-font-color-highlighted;
+}
+
+/* MENU ITEM (children of a MENU BUTTON) */
+/*** The item itself (not hovered / focused) ***/    
+.menu-item {
+  -fx-background-color: -fx-my-menu-color; 
+}
+
+/*** The item's label (not hovered / focused) ***/   
+.menu-item .label {
+  -fx-text-fill: -fx-my-menu-font-color;
+  -fx-padding: 5 65 5 5;
+}
+
+/*** The item's label (disabled) ***/   
+.menu-item .label:disabled {
+  -fx-opacity: 1.0;
+}    
+
+/*** The item itself (hovered / focused) ***/    
+.menu-item:focused, .menu-item:hovered {
+  -fx-background-color: -fx-my-menu-color-highlighted; 
+}
+
+/*** The item's label (hovered / focused) ***/  
+.menu-item:focused .label, .menu-item:hovered .label {
+  -fx-text-fill: -fx-my-menu-font-color-highlighted;
+}
+
+/* CONTEXT MENU */
+/*** The context menu that contains a menu's menu items ***/  
+.context-menu {
+  -fx-background-color: -fx-my-menu-color;
+  -fx-background-radius: 5px;
+}
+
+.button {
+  -fx-border-width: 1px;
+  -fx-border-color: #444343;
+  -fx-background-color: #eee;
+  -fx-border-radius: 4px;
+  cursor: pointer;
+}
+
+.button:hover {
+  -fx-background-color: #ddd;
+}
+
+.button.disabled {
+  -fx-background-color: #ccc;
+  -fx-border-color: #ccc;
+  -fx-opacity: 0.3;
+  cursor: default;
+}
+
+.title {
+  -fx-text-fill: #ccc;
+  -fx-font-size: 13px;
+}
+
+#progress-slider .track{
+  -fx-background-color:transparent;
+}

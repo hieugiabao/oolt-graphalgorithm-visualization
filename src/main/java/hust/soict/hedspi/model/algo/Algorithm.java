@@ -26,4 +26,6 @@ public abstract class Algorithm {
   public abstract void explore();
 
   public abstract void printStep();
+
+  public abstract List<Step> getStepsList();
 }

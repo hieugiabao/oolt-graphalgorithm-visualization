@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import java.lang.String?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.Cursor?>
+<?import javafx.scene.Group?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.Slider?>
+<?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.shape.Rectangle?>
+<?import javafx.scene.text.Font?>
+
+<HBox fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="60.0" prefWidth="1024" stylesheets="@../css/control.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hust.soict.hedspi.controllers.ControlController">
+   <children>
+      <ImageView fitHeight="35.0" fitWidth="15.0" pickOnBounds="true" preserveRatio="true">
+         <HBox.margin>
+            <Insets left="5.0" top="12.5" />
+         </HBox.margin>
+         <image>
+            <Image url="@../icon/121.png" />
+         </image>
+      </ImageView>
+      <Button fx:id="createGraphBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+         <HBox.margin>
+            <Insets left="5.0" top="15.0" />
+         </HBox.margin>
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/create.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </graphic>
+         <styleClass>
+            <String fx:value="button" />
+         </styleClass>
+         <tooltip>
+            <Tooltip text="Create a new graph">
+               <styleClass>
+                  <String fx:value="title" />
+               </styleClass>
+            </Tooltip>
+         </tooltip>
+      </Button>
+      <Button fx:id="ẽampleBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/example.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <styleClass>
+            <String fx:value="button" />
+         </styleClass>
+         <tooltip>
+            <Tooltip text="Example graph">
+               <styleClass>
+                  <String fx:value="title" />
+               </styleClass>
+            </Tooltip>
+         </tooltip>
+      </Button>
+      <Button fx:id="editBtn" layoutX="35.0" layoutY="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/edit.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Edit graph" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="printBtn" layoutX="85.0" layoutY="20.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/printer.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Export graph" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <MenuButton fx:id="menuAlgo" mnemonicParsing="false" prefHeight="30.0" prefWidth="130.0" text="Choose algorithm">
+         <items>
+            <Menu fx:id="primBtn" mnemonicParsing="false" text="PRIM">
+               <items>
+                  <MenuItem disable="true" mnemonicParsing="false" text="Choose start vertex" />
+               </items>
+            </Menu>
+            <MenuItem fx:id="kruskalBtn" mnemonicParsing="false" text="Kruskal" />
+         </items>
+         <HBox.margin>
+            <Insets left="15.0" top="15.0" />
+         </HBox.margin>
+      </MenuButton>
+      <VBox prefHeight="60.0" prefWidth="145.0">
+         <HBox.margin>
+            <Insets left="2.0" />
+         </HBox.margin>
+         <children>
+            <Label fx:id="speedLabel" prefHeight="17.0" prefWidth="133.0" text="Run  speed at">
+               <VBox.margin>
+                  <Insets left="15.0" top="7.5" />
+               </VBox.margin>
+               <font>
+                  <Font size="13.0" />
+               </font>
+            </Label>
+            <Slider fx:id="speedControl" blockIncrement="0.25" max="1.5" min="0.5" value="1.0">
+               <VBox.margin>
+                  <Insets top="5.0" />
+               </VBox.margin>
+            </Slider>
+         </children>
+      </VBox>
+      <Button fx:id="goBeginBtn" layoutX="359.0" layoutY="23.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/begin.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Go to beginning" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="backwardBtn" layoutX="404.0" layoutY="23.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/previous.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Step backward" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="playBtn" layoutX="447.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/play.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Execute algorithm" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="forwardBtn" layoutX="490.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/next.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Step forward" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Button fx:id="goEndBtn" layoutX="124.0" layoutY="23.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../icon/end.png" />
+               </image>
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip styleClass="title" text="Go to end" />
+         </tooltip>
+         <HBox.margin>
+            <Insets left="2.0" top="15.0" />
+         </HBox.margin>
+      </Button>
+      <Group>
+         <children>
+            <Rectangle fx:id="progressRec" arcHeight="15.0" arcWidth="15.0" fill="#cccccc" stroke="BLACK" strokeType="INSIDE" />
+            <Slider id="progress-slider" fx:id="progressSlider" prefHeight="14.0" prefWidth="214.0">
+               <cursor>
+                  <Cursor fx:constant="HAND" />
+               </cursor>
+            </Slider>
+         </children>
+         <HBox.margin>
+            <Insets left="10.0" top="23.0" />
+         </HBox.margin>
+      </Group>
+   </children>
+</HBox>

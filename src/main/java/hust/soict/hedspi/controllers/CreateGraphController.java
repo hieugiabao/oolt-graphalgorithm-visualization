@@ -6,6 +6,8 @@ import java.util.ResourceBundle;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import hust.soict.hedspi.model.graph.BaseGraph;
+import hust.soict.hedspi.model.graph.Edge;
 import javafx.application.Platform;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
@@ -20,6 +22,8 @@ public class CreateGraphController implements Initializable {
   private GraphInfoController infoController;
   @FXML
   private DrawGraphController drawController;
+
+  private BaseGraph<? extends Edge> graph;
 
   @Override
   public void initialize(URL arg0, ResourceBundle arg1) {
@@ -51,5 +55,13 @@ public class CreateGraphController implements Initializable {
 
   public StackPane getRoot() {
     return root;
+  }
+
+  public BaseGraph<? extends Edge> getGraph() {
+    return graph;
+  }
+
+  public void setGraph(BaseGraph<? extends Edge> graph) {
+    this.graph = graph;
   }
 }

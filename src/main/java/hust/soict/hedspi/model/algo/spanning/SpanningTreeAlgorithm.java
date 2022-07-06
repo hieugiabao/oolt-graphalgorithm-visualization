@@ -58,4 +58,16 @@ public abstract class SpanningTreeAlgorithm extends Algorithm {
   protected String fromEdgeToString(Edge edge) {
     return "(" + edge.getWeight() + ",(" + edge.getSource().getId() + "," + edge.getTarget().getId() + "))";
   }
+
+  @Override
+  public List<Step> getStepsList() {
+    if (steps.isEmpty()) {
+      spanningTree = getSpanningTree();
+    }
+    return steps;
+  }
+
+  public Map<Integer, String> getPseudoCode() {
+    return pseudoCode;
+  }
 }

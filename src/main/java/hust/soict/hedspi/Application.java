@@ -5,18 +5,12 @@ import java.io.IOException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import hust.soict.hedspi.model.graph.BaseGraph;
-import hust.soict.hedspi.model.graph.DirectedGraph;
-import hust.soict.hedspi.model.graph.UndirectedGraph;
-import hust.soict.hedspi.view.GraphPanel;
-import hust.soict.hedspi.view.container.GraphContainer;
-import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.image.Image;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
 
 /**
  * Hello world!
@@ -49,24 +43,33 @@ public class Application extends javafx.application.Application {
 	public void start(Stage primaryStage) {
 		// TODO Auto-generated method stub
 
-		DirectedGraph graph = (DirectedGraph) BaseGraph.CP4414();
-		// PlacementStrategy stategy = new CircularPlacementStrategy();
-		GraphPanel graphView = new GraphPanel(graph);
-		GraphContainer container = new GraphContainer(graphView);
-		Scene scene = new Scene(container, 800, 600);
-		primaryStage.setScene(scene);
-		primaryStage.setTitle("Graph");
-		primaryStage.show();
-		graphView.init();
-		logger.info("Graph view initialized");
-
 		/*
-		 * 
+		 * DirectedGraph graph = (DirectedGraph) BaseGraph.CP4414();
+		 * // PlacementStrategy stategy = new CircularPlacementStrategy();
+		 * GraphPanel graphView = new GraphPanel(graph);
+		 * GraphContainer container = new GraphContainer(graphView);
+		 * Scene scene = new Scene(container, 800, 600);
+		 * primaryStage.setScene(scene);
+		 * primaryStage.setTitle("Graph");
+		 * primaryStage.show();
 		 * graphView.init();
 		 * logger.info("Graph view initialized");
 		 */
+		try {
+			stage = new Stage(StageStyle.DECORATED);
+			Parent root = loadFXML("main");
+			scene = new Scene(root);
+			stage.setScene(scene);
+			stage.setTitle("Graph visualization");
+			stage.setMaximized(true);
+			stage.show();
 
-		// graphView.setAutomaticLayout(false);
+			stage.getIcons().add(new Image(getClass().getResource("/icon/logo.jpg").toExternalForm()));
+		} catch (IOException e) {
+			// TODO: handle exception
+			logger.error("Error: ", e);
+		}
+
 	}
 
 	private static Parent loadFXML(String fxml) throws IOException {
