@@ -2,11 +2,13 @@ package hust.soict.hedspi.controllers;
 
 import static javafx.beans.binding.Bindings.createBooleanBinding;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import javax.imageio.ImageIO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -22,6 +24,7 @@ import javafx.application.Platform;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
@@ -33,11 +36,14 @@ import javafx.scene.control.Menu;
 import javafx.scene.control.MenuButton;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.Slider;
+import javafx.scene.image.WritableImage;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.Rectangle;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
+import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.Duration;
 
 public class ControlController implements Initializable {
@@ -52,7 +58,7 @@ public class ControlController implements Initializable {
   private HBox root;
   @FXML
   private Button createGraphBtn, exampleBtn, editBtn, printBtn, goBeginBtn,
-      backwardBtn, playBtn, forwardBtn, goEndBtn;
+      backwardBtn, playBtn, forwardBtn, goEndBtn, pauseBtn, replayBtn;
   @FXML
   private Label speedLabel;
   @FXML
@@ -87,6 +93,16 @@ public class ControlController implements Initializable {
           createGraph();
       });
 
+      printBtn.setOnMousePressed(e -> {
+        if (e.isPrimaryButtonDown())
+          exportGraph();
+      });
+
+      exampleBtn.setOnMousePressed(e -> {
+        if (e.isPrimaryButtonDown())
+          createExample();
+      });
+
       kruskalBtn.setOnAction(e -> {
         if (isPlaying)
           stop();
@@ -103,6 +119,30 @@ public class ControlController implements Initializable {
             play();
           } else {
             startAnimation();
+          }
+        }
+      });
+
+      pauseBtn.setOnMousePressed(e -> {
+        if (e.isPrimaryButtonDown()) {
+          if (isPlaying) {
+            pause();
+          }
+        }
+      });
+
+      replayBtn.setOnMousePressed(e -> {
+        if (e.isPrimaryButtonDown()) {
+          if (isPlaying) {
+            goToBegin();
+            if (pauseControl == null) {
+              pauseControl = new PauseTransition(Duration.millis(animationDuration));
+              pauseControl.setOnFinished(e2 -> {
+                play();
+                pauseControl = null;
+              });
+              pauseControl.play();
+            }
           }
         }
       });
@@ -219,16 +259,20 @@ public class ControlController implements Initializable {
     });
 
     progressSlider.setOnMousePressed(e -> {
-      if (isPlaying && !isPaused && e.isPrimaryButtonDown()) {
-        pause();
-        jumToIteration((int) (progressSlider.getValue()));
-        if (pauseControl == null) {
-          pauseControl = new PauseTransition(Duration.millis(animationDuration));
-          pauseControl.setOnFinished(ev -> {
-            play();
-            pauseControl = null;
-          });
-          pauseControl.play();
+      if (isPlaying && e.isPrimaryButtonDown()) {
+        if (!isPaused) {
+          sequentialTransition.stop();
+          jumpToIteration((int) (progressSlider.getValue()));
+          if (pauseControl == null) {
+            pauseControl = new PauseTransition(Duration.millis(animationDuration));
+            pauseControl.setOnFinished(ev -> {
+              play();
+              pauseControl = null;
+            });
+            pauseControl.play();
+          }
+        } else {
+          jumpToIteration((int) (progressSlider.getValue()));
         }
       }
     });
@@ -236,21 +280,25 @@ public class ControlController implements Initializable {
     progressSlider.setOnMouseDragged(e -> {
       if (isPlaying && e.isPrimaryButtonDown()) {
         pause();
-        jumToIteration((int) (progressSlider.getValue()));
+        jumpToIteration((int) (progressSlider.getValue()));
       }
     });
 
     progressSlider.setOnMouseDragExited(e -> {
-      if (isPlaying && !isPaused && e.isPrimaryButtonDown()) {
-        pause();
-        jumToIteration((int) (progressSlider.getValue()));
-        if (pauseControl == null) {
-          pauseControl = new PauseTransition(Duration.millis(animationDuration));
-          pauseControl.setOnFinished(ev -> {
-            play();
-            pauseControl = null;
-          });
-          pauseControl.play();
+      if (isPlaying && e.isPrimaryButtonDown()) {
+        if (!isPaused) {
+          sequentialTransition.stop();
+          jumpToIteration((int) (progressSlider.getValue()));
+          if (pauseControl == null) {
+            pauseControl = new PauseTransition(Duration.millis(animationDuration));
+            pauseControl.setOnFinished(ev -> {
+              play();
+              pauseControl = null;
+            });
+            pauseControl.play();
+          }
+        } else {
+          jumpToIteration((int) (progressSlider.getValue()));
         }
       }
     });
@@ -272,6 +320,32 @@ public class ControlController implements Initializable {
 
       if (createGraphController.getGraph() != null) {
         setGraph(createGraphController.getGraph());
+        logger.info("graph received: {}, {}", mainController.graph.vertexSet(), mainController.graph.edgeSet());
+      } else {
+        logger.info("graph is null");
+      }
+    } catch (IOException e) {
+      logger.error("Cannot open fxml file", e);
+    }
+  }
+
+  private void createExample() {
+    try {
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/example.fxml"));
+      Parent parent = loader.load();
+      ExampleGraphController exampleGraphController = loader.getController();
+
+      Scene newScene = new Scene(parent);
+      Stage newStage = new Stage(StageStyle.DECORATED);
+      newStage.initModality(Modality.APPLICATION_MODAL);
+      newStage.initOwner(root.getScene().getWindow());
+      newStage.setTitle("Example graph");
+      newStage.setScene(newScene);
+      newStage.setOnShown(exampleGraphController::adjustUI);
+      newStage.showAndWait();
+
+      if (exampleGraphController.getGraph() != null) {
+        setGraph(exampleGraphController.getGraph());
         logger.info("graph received: {}, {}", mainController.graph.vertexSet(), mainController.graph.edgeSet());
       } else {
         logger.info("graph is null");
@@ -333,6 +407,9 @@ public class ControlController implements Initializable {
     mainController.clearDisplay();
     isPlaying = false;
     isPaused = false;
+    replayBtn.setVisible(false);
+    pauseBtn.setVisible(false);
+    playBtn.setVisible(true);
   }
 
   public void startAnimation() {
@@ -353,6 +430,10 @@ public class ControlController implements Initializable {
       isPaused = false;
       if (currentIteration < 0)
         currentIteration = 0;
+      playBtn.setVisible(false);
+      replayBtn.setVisible(false);
+      pauseBtn.setVisible(true);
+
       sequentialTransition = new SequentialTransition();
       if (animationStatus == ANIMATION_STOP) {
         animationStatus = ANIMATION_PLAY;
@@ -399,6 +480,8 @@ public class ControlController implements Initializable {
     currentIteration++;
     if (currentIteration >= maxIteration) {
       currentIteration = maxIteration - 1;
+      animationStatus = ANIMATION_PAUSE;
+      isPaused = true;
       return;
     }
     progressSlider.setValue(currentIteration);
@@ -418,12 +501,15 @@ public class ControlController implements Initializable {
     isPaused = true;
     animationStatus = ANIMATION_PAUSE;
     sequentialTransition.stop();
+    replayBtn.setVisible(false);
+    pauseBtn.setVisible(false);
+    playBtn.setVisible(true);
   }
 
   private void stepBackward() {
     if (isPlaying) {
       if (!isPaused) {
-        pause();
+        sequentialTransition.stop();
         previous();
         if (pauseControl == null) {
           pauseControl = new PauseTransition(Duration.millis(animationDuration));
@@ -442,7 +528,7 @@ public class ControlController implements Initializable {
   private void stepForward() {
     if (isPlaying) {
       if (!isPaused) {
-        pause();
+        sequentialTransition.stop();
         next();
         if (pauseControl == null) {
           pauseControl = new PauseTransition(Duration.millis(animationDuration));
@@ -458,8 +544,9 @@ public class ControlController implements Initializable {
     }
   }
 
-  private void jumToIteration(int iteration) {
-    pause();
+  private void jumpToIteration(int iteration) {
+    if (isPaused == false)
+      sequentialTransition.stop();
     currentIteration = iteration;
     if (currentIteration >= maxIteration) {
       currentIteration = maxIteration - 1;
@@ -476,18 +563,53 @@ public class ControlController implements Initializable {
   private void updateDisplay() {
     progressSlider.setValue(currentIteration);
     if (currentIteration == maxIteration - 1) {
-
+      playBtn.setVisible(false);
+      pauseBtn.setVisible(false);
+      replayBtn.setVisible(true);
+    } else {
+      if (isPaused) {
+        pauseBtn.setVisible(false);
+        replayBtn.setVisible(false);
+        playBtn.setVisible(true);
+      } else {
+        playBtn.setVisible(false);
+        replayBtn.setVisible(false);
+        pauseBtn.setVisible(true);
+      }
     }
     mainController.updateDisplay(steps.get(currentIteration));
   }
 
   private void goToBegin() {
-    jumToIteration(0);
-    progressSlider.setValue(currentIteration);
+    pause();
+    jumpToIteration(0);
   }
 
   private void goToEnd() {
-    jumToIteration(maxIteration - 1);
+    pause();
+    jumpToIteration(maxIteration - 1);
   }
 
+  private void exportGraph() {
+    if (mainController.graph == null)
+      return;
+    FileChooser fileChooser = new FileChooser();
+    fileChooser.setTitle("Save");
+    fileChooser.getExtensionFilters().addAll(
+        new ExtensionFilter("png files (*.png)", "*.png"));
+    File file = fileChooser.showSaveDialog(root.getScene().getWindow());
+    if (file != null) {
+      try {
+        WritableImage writableImage = new WritableImage(
+            (int) (mainController.graphPane.getWidth() * mainController.graphPane.getScaleX()) + 20,
+            (int) (mainController.graphPane.getHeight() * mainController.graphPane.getScaleY()) + 20);
+        mainController.graphPane.snapshot(null, writableImage);
+        java.awt.image.RenderedImage renderedImage = SwingFXUtils.fromFXImage(writableImage, null);
+        ImageIO.write(renderedImage, "png", file);
+      } catch (IOException e) {
+        // TODO: handle exception
+        logger.error("Error when save file", e);
+      }
+    }
+  }
 }

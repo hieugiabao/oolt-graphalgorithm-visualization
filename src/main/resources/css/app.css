@@ -1,0 +1,22 @@
+.label {
+  -fx-font-size: 15;
+  -fx-font-weight: bolder;
+  -fx-padding: 5 0 0 5;
+}
+
+.label.even {
+  -fx-background-color: #F9F9F9;
+}
+
+.label.odd {
+  -fx-background-color: #E0E0E0;
+}
+
+.label.even:hover, .label.odd:hover {
+  -fx-cursor: hand;
+  -fx-background-color: #7dbadd;
+}
+
+.label.even.selected, .label.odd.selected {
+  -fx-background-color: #39a2df;
+}

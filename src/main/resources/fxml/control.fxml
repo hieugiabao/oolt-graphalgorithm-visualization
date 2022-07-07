@@ -53,7 +53,7 @@
             </Tooltip>
          </tooltip>
       </Button>
-      <Button fx:id="ẽampleBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
+      <Button fx:id="exampleBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0">
          <HBox.margin>
             <Insets left="2.0" top="15.0" />
          </HBox.margin>
@@ -171,21 +171,49 @@
             <Insets left="2.0" top="15.0" />
          </HBox.margin>
       </Button>
-      <Button fx:id="playBtn" layoutX="447.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
-         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../icon/play.png" />
-               </image>
-            </ImageView>
-         </graphic>
-         <tooltip>
-            <Tooltip styleClass="title" text="Execute algorithm" />
-         </tooltip>
+      <Group>
+         <children>
+            <Button fx:id="playBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/play.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip styleClass="title" text="Execute algorithm" />
+               </tooltip>
+            </Button>
+            <Button fx:id="pauseBtn" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button" visible="false">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/pause.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip styleClass="title" text="Pause" />
+               </tooltip>
+            </Button>
+            <Button fx:id="replayBtn" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button" visible="false">
+               <graphic>
+                  <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+                     <image>
+                        <Image url="@../icon/reset.png" />
+                     </image>
+                  </ImageView>
+               </graphic>
+               <tooltip>
+                  <Tooltip styleClass="title" text="Replay" />
+               </tooltip>
+            </Button>
+         </children>
          <HBox.margin>
             <Insets left="2.0" top="15.0" />
          </HBox.margin>
-      </Button>
+      </Group>
       <Button fx:id="forwardBtn" layoutX="490.0" layoutY="10.0" mnemonicParsing="false" prefHeight="30.0" prefWidth="30.0" styleClass="button">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">

@@ -1,5 +1,5 @@
 .graph {
-  --fx-background-color: #F4FFFB;
+  --fx-background-color: red;
 }
 
 .vertex {
@@ -25,7 +25,7 @@
 }
 
 .edge-label {
-  -fx-font: normal 7pt "sans-serif";
+  -fx-font: normal 9pt "sans-serif";
   -fx-fill: #333;
 }
 
@@ -41,8 +41,8 @@
 }
 
 .vertex-highlighted {
-  -fx-fill: #ff8a27;
-  -fx-stroke: #ff8a27;
+  -fx-fill: #4be60e;
+  -fx-stroke: #4be60e;
   -fx-scale-x: 1.1;
   -fx-scale-y: 1.1;
   -fx-scale-z: 1.1;
@@ -57,21 +57,29 @@
   -fx-stroke: #ccc;
 }
 
-.edge-highlighted {
-  -fx-stroke: #ff8a27;
-  -fx-stroke-width: 3.5;
+.edge-highlighted, .arrow-highlighted {
+  -fx-stroke: #4be60e;
+  -fx-stroke-width: 4;
 }
 
-.edge-traversed, .arrow-highlighted, .arrow-traversed {
+.edge-traversed, .arrow-traversed {
   -fx-stroke: #ff8a27;
 }
 
-.vertex-label-traversed, .edge-label-highlighted, .edge-label-traversed {
+.edge-label-highlighted {
+  -fx-fill: #4be60e;
+}
+
+.vertex-label-traversed, .edge-label-traversed {
   -fx-fill: #ff8a27;
 }
 
-.vertex-label-unqueued, .edge-label-unqueued, .arrow-unqueued {
+.vertex-label-unqueued, .edge-label-unqueued {
   -fx-fill: #ccc;
+}
+
+.arrow-unqueued {
+  -fx-stroke: #ccc;
 }
 
 .vertex-label-highlighted {

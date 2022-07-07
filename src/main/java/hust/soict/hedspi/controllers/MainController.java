@@ -46,7 +46,7 @@ public class MainController implements Initializable {
   SpanningTreeAlgorithm mstAlgorithm = null;
   BooleanProperty graphDisableBtnProperty = new SimpleBooleanProperty(true);
   BooleanProperty algoDisableProperty = new SimpleBooleanProperty(true);
-  private GraphPanel graphPane = null;
+  GraphPanel graphPane = null;
 
   @Override
   public void initialize(URL uri, ResourceBundle resourceBundle) {

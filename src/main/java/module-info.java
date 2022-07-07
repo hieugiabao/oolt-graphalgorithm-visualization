@@ -3,6 +3,7 @@ module oolt.project {
   requires javafx.controls;
   requires transitive javafx.graphics;
   requires javafx.fxml;
+  requires transitive javafx.swing;
   requires org.apache.logging.log4j;
 
   opens hust.soict.hedspi to javafx.fxml;
