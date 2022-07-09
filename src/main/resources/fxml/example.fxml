@@ -9,7 +9,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" style="-fx-border-radius: 4;" stylesheets="@../css/app.css" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hust.soict.hedspi.controllers.ExampleGraphController">
+<BorderPane fx:id="root" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="650.0" prefWidth="900.0" style="-fx-border-radius: 4;" stylesheets="@../css/app.css" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="hust.soict.hedspi.controllers.ExampleGraphController">
    <bottom>
       <AnchorPane fx:id="controlPane" prefHeight="50.0" prefWidth="777.0" BorderPane.alignment="CENTER">
          <children>
@@ -21,8 +21,8 @@
    </bottom>
    <center>
       <SplitPane dividerPositions="0.23673997412677877" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-        <items>
-          <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="480.0" prefWidth="180.0">
+         <items>
+            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="480.0" prefWidth="180.0">
                <children>
                   <Label layoutY="-1.0" prefHeight="24.0" prefWidth="180.0" style="-fx-background-color: #969696;" text=" GRAPH EXAMPLE" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                      <font>
@@ -33,7 +33,7 @@
                </children>
             </AnchorPane>
             <BorderPane fx:id="previewContainer" />
-        </items>
+         </items>
       </SplitPane>
    </center>
 </BorderPane>

@@ -13,7 +13,7 @@
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="root" fx:controller="hust.soict.hedspi.controllers.GraphInfoController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="450.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1">
+<AnchorPane fx:id="root" fx:controller="hust.soict.hedspi.controllers.GraphInfoController" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="473.0" prefWidth="450.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1">
   <children>
     <Line fx:id="upLine" endX="450.0" endY="56.5" layoutY="10.0" startY="56.5" stroke="#726b6b" strokeType="OUTSIDE" strokeWidth="1.5" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="65.0" />
     <Label layoutX="14.0" prefHeight="35.0" prefWidth="138.0" text="Graph Simulator" AnchorPane.leftAnchor="14.0" AnchorPane.topAnchor="0.0">
