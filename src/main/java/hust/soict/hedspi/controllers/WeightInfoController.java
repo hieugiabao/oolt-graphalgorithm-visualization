@@ -2,8 +2,6 @@ package hust.soict.hedspi.controllers;
 
 import hust.soict.hedspi.model.graph.Edge;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.DoubleProperty;
-import javafx.beans.property.SimpleDoubleProperty;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -20,11 +18,9 @@ public class WeightInfoController {
   @FXML
   private TextField weightInput;
   private double weight = Edge.DEFAULT_EDGE_WEIGHT;
-  DoubleProperty weightProperty;
 
   @FXML
   private void initialize() {
-    weightProperty = new SimpleDoubleProperty(weight);
     weightInput.setText(weight + "");
     BooleanBinding binding = weightInput.textProperty().isEmpty();
     confirmButton.disableProperty().bind(binding);
@@ -47,7 +43,6 @@ public class WeightInfoController {
   private void confirm() {
     try {
       weight = Double.parseDouble(weightInput.getText());
-      weightProperty.set(weight);
       confirmButton.getScene().getWindow().hide();
     } catch (NumberFormatException e) {
       weight = Edge.DEFAULT_EDGE_WEIGHT;

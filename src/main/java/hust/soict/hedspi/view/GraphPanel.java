@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -45,6 +46,12 @@ public class GraphPanel extends Pane {
   private final boolean edgesWithLabels;
   private final PlacementStrategy placementStrategy;
 
+  private VertexView selectedVertex = null;
+  private BaseEdgeView selectedEdge = null;
+
+  private Consumer<VertexView> vertexClickConsumer = null;
+  private Consumer<BaseEdgeView> edgeClickConsumer = null;
+
   private final BooleanProperty automaticLayout;
   private AnimationTimer timer;
   private boolean initialized = false;
@@ -70,6 +77,7 @@ public class GraphPanel extends Pane {
     this.state = state == null ? createDefaultState() : state;
 
     initNodes();
+    enableRightClickListener();
 
     timer = new AnimationTimer() {
       @Override
@@ -546,5 +554,70 @@ public class GraphPanel extends Pane {
   public void setState(State newState) {
     this.state = newState;
     updateState();
+  }
+
+  public void setVertexRightClickAction(Consumer<VertexView> action) {
+    this.vertexClickConsumer = action;
+  }
+
+  public void setEdgeRightClickAction(Consumer<BaseEdgeView> action) {
+    this.edgeClickConsumer = action;
+  }
+
+  private void enableRightClickListener() {
+    setOnMouseClicked((ev) -> {
+      if (ev.isSecondaryButtonDown()) {
+        if (vertexClickConsumer == null || edgeClickConsumer == null)
+          return;
+
+        Node node = pick(this, ev.getX(), ev.getY());
+        if (node == null)
+          return;
+
+        if (node instanceof VertexView) {
+          VertexView v = (VertexView) node;
+          vertexClickConsumer.accept(v);
+        } else if (node instanceof BaseEdgeView) {
+          BaseEdgeView e = (BaseEdgeView) node;
+          edgeClickConsumer.accept(e);
+        }
+      } else if (ev.isPrimaryButtonDown()) {
+
+      }
+    });
+  }
+
+  public void selectVertex(Vertex v) {
+    VertexView vertexView = vertexNodes.get(v);
+    if (selectedVertex != null)
+      selectedVertex.selected(false);
+
+    if (vertexView == null || vertexView.equals(selectedVertex)) {
+      selectedVertex = null;
+      return;
+    }
+    selectedVertex = vertexView;
+    selectedVertex.selected(true);
+  }
+
+  public void selectEdge(Edge e) {
+    BaseEdgeView edgeView = edgeNodes.get(e);
+    if (selectedEdge != null)
+      selectedEdge.selected(false);
+    if (edgeView == null || edgeView.equals(selectedEdge)) {
+      selectedEdge = null;
+      return;
+    }
+
+    selectedEdge = edgeView;
+    selectedEdge.selected(true);
+  }
+
+  public BaseEdgeView getSelectedEdge() {
+    return selectedEdge;
+  }
+
+  public VertexView getSelectedVertex() {
+    return selectedVertex;
   }
 }

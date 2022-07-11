@@ -23,7 +23,8 @@ public class CreateGraphController implements Initializable {
   @FXML
   private DrawGraphController drawController;
 
-  private BaseGraph<? extends Edge> graph;
+  BaseGraph<? extends Edge> graph;
+  boolean isDirected = false, isWeighted = false;
 
   @Override
   public void initialize(URL arg0, ResourceBundle arg1) {
@@ -47,10 +48,10 @@ public class CreateGraphController implements Initializable {
     infoController.show();
   }
 
-  public void toDrawGraph(boolean directed, boolean weighted) {
+  public void toDrawGraph() {
     infoController.hide();
     drawController.show();
-    drawController.init(directed, weighted);
+    drawController.init();
   }
 
   public StackPane getRoot() {
@@ -59,9 +60,5 @@ public class CreateGraphController implements Initializable {
 
   public BaseGraph<? extends Edge> getGraph() {
     return graph;
-  }
-
-  public void setGraph(BaseGraph<? extends Edge> graph) {
-    this.graph = graph;
   }
 }

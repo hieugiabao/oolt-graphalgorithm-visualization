@@ -23,7 +23,6 @@ public class GraphInfoController implements Initializable {
 
   private static final Logger logger = LogManager.getLogger(GraphInfoController.class);
 
-  private boolean directed = false, weighted = false, undirected = false, unweighted = false;
   private String name = null;
   private BooleanBinding nameFieldValid, diretionValid, weightValid;
   private CreateGraphController mainController;
@@ -45,12 +44,10 @@ public class GraphInfoController implements Initializable {
     upLine.endXProperty().bind(root.widthProperty());
     downLine.endXProperty().bind(root.widthProperty());
 
-    directedButton.setSelected(directed);
-    undirectedButton.setSelected(undirected);
-    unweightedButton.setSelected(unweighted);
-    weightedButton.setSelected(weighted);
-
-    nextButton.setDisable(true);
+    directedButton.setSelected(false);
+    undirectedButton.setSelected(false);
+    unweightedButton.setSelected(false);
+    weightedButton.setSelected(false);
 
     nameFieldValid = createBooleanBinding(() -> {
       if (nameField.getText() == null || nameField.getText().length() == 0) {
@@ -76,24 +73,20 @@ public class GraphInfoController implements Initializable {
     nextButton.disableProperty().bind(nameFieldValid.not().or(diretionValid.not()).or(weightValid.not()));
 
     directedButton.setOnAction(e -> {
-      directed = true;
-      undirected = false;
-      logger.debug("Press directed button: " + directed);
+      mainController.isDirected = true;
+      // logger.debug("Press directed button: " + directed);
     });
     undirectedButton.setOnAction(e -> {
-      directed = false;
-      undirected = true;
-      logger.debug("Press undirected button: " + undirected);
+      mainController.isDirected = false;
+      // logger.debug("Press undirected button: " + undirected);
     });
     unweightedButton.setOnAction(e -> {
-      unweighted = true;
-      weighted = false;
-      logger.debug("Press unweighted button: " + unweighted);
+      mainController.isWeighted = false;
+      // logger.debug("Press unweighted button: " + unweighted);
     });
     weightedButton.setOnAction(e -> {
-      unweighted = false;
-      weighted = true;
-      logger.debug("Press weighted button: " + weighted);
+      mainController.isWeighted = true;
+      // logger.debug("Press weighted button: " + weighted);
     });
     nameField.textProperty().addListener((observable, oldValue, newValue) -> {
       name = newValue;
@@ -106,7 +99,7 @@ public class GraphInfoController implements Initializable {
     });
 
     nextButton.onMouseClickedProperty().set(e -> {
-      mainController.toDrawGraph(directed, weighted);
+      mainController.toDrawGraph();
     });
   }
 

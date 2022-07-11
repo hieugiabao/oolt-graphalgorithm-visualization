@@ -185,4 +185,26 @@ public class EdgeViewLine extends Line implements BaseEdgeView {
         break;
     }
   }
+
+  @Override
+  public void selected(boolean b) {
+    // TODO Auto-generated method stub
+    if (b) {
+      addStyleClass("edge-selected");
+      if (attachedLabel != null) {
+        attachedLabel.addStyleClass("edge-label-selected");
+      }
+      if (attachedArrow != null) {
+        attachedArrow.addStyleClass("arrow-selected");
+      }
+    } else {
+      removeStyleClass("edge-selected");
+      if (attachedLabel != null) {
+        attachedLabel.removeStyleClass("edge-label-selected");
+      }
+      if (attachedArrow != null) {
+        attachedArrow.removeStyleClass("arrow-selected");
+      }
+    }
+  }
 }

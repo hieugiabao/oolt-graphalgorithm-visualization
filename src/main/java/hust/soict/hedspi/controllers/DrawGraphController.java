@@ -14,7 +14,6 @@ import org.apache.logging.log4j.Logger;
 
 import static javafx.beans.binding.Bindings.createBooleanBinding;
 
-import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.DirectedEdge;
 import hust.soict.hedspi.model.graph.DirectedGraph;
 import hust.soict.hedspi.model.graph.Edge;
@@ -39,6 +38,10 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.ContextMenu;
+import javafx.scene.control.MenuItem;
+import javafx.scene.image.ImageView;
+import javafx.scene.input.MouseButton;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -55,11 +58,12 @@ public class DrawGraphController {
   private final double RADIUS = 15;
   private final Logger logger = LogManager.getLogger(DrawGraphController.class);
 
-  private boolean isDirected, isWeighted;
+  private boolean isDirected = false, isWeighted = false;
   private int id = 0;
-  private BaseGraph<? extends Edge> graph;
   private Map<Vertex, VertexView> vertexViewMap = new LinkedHashMap<>();
   private Map<Edge, BaseEdgeView> edgeViewMap = new LinkedHashMap<>();
+  private Map<Vertex, BorderPane> paneVertex = new LinkedHashMap<>();
+  private Map<Edge, BorderPane> paneEdge = new LinkedHashMap<>();
   private BooleanProperty empty;
   private Line l;
   private Arrow arrow;
@@ -74,23 +78,28 @@ public class DrawGraphController {
   @FXML
   private Pane canvas;
 
-  public void init(boolean isDirected, boolean isWeighted) {
+  private Pane nanoPane = new Pane();
+  private ContextMenu contextMenu = new ContextMenu();
+  private MenuItem deleteItem = new MenuItem("Delete");
+  private MenuItem changeItem = new MenuItem("Change weight");
+
+  public void init() {
     // TODO Auto-generated method stub
-    if (this.isDirected == isDirected && this.isWeighted == isWeighted) {
-      if (graph == null)
-        graph = isDirected ? new DirectedGraph(isWeighted) : new UndirectedGraph(isWeighted);
+    if (mainController.isDirected == this.isDirected && mainController.isWeighted == this.isWeighted) {
+      if (mainController.graph == null)
+        mainController.graph = isDirected ? new DirectedGraph(isWeighted) : new UndirectedGraph(isWeighted);
     } else {
       reset();
-      this.isDirected = isDirected;
-      this.isWeighted = isWeighted;
-      graph = isDirected ? new DirectedGraph(isWeighted) : new UndirectedGraph(isWeighted);
+      this.isDirected = mainController.isDirected;
+      this.isWeighted = mainController.isWeighted;
+      mainController.graph = isDirected ? new DirectedGraph(isWeighted) : new UndirectedGraph(isWeighted);
     }
 
     line.endXProperty().bind(root.widthProperty());
 
-    empty = new SimpleBooleanProperty(graph, "empty", true);
+    empty = new SimpleBooleanProperty(mainController.graph, "empty", true);
     BooleanBinding haveGraph = createBooleanBinding(() -> {
-      if (graph.isEmpty()) {
+      if (mainController.graph.isEmpty()) {
         return true;
       } else {
         return false;
@@ -102,22 +111,25 @@ public class DrawGraphController {
       createVertex(e);
     });
 
-    previousButton.onMouseClickedProperty().set(e -> {
+    previousButton.onMouseClickedProperty().set(e ->
+
+    {
       logger.debug("Previous button clicked");
       mainController.toInfoGraph();
     });
 
     cancelButton.onMouseClickedProperty().set(e -> {
       logger.debug("Cancel button clicked");
-      this.graph = null;
+      mainController.graph = null;
       cancelButton.getScene().getWindow().hide();
     });
 
     doneButton.onMouseClickedProperty().set(e -> {
-      logger.info("graph finished: {}, {}", graph.vertexSet(), graph.edgeSet());
-      mainController.setGraph(graph);
+      logger.info("graph finished: {}, {}", mainController.graph.vertexSet(), mainController.graph.edgeSet());
       root.getScene().getWindow().hide();
     });
+
+    setupContextMenu();
   }
 
   private void createVertex(MouseEvent e) {
@@ -140,50 +152,55 @@ public class DrawGraphController {
       borderPane.setLayoutX(x - RADIUS * 2.5);
       borderPane.setLayoutY(y - RADIUS * 2.5);
       borderPane.setPrefSize(RADIUS * 5, RADIUS * 5);
+      paneVertex.put(vertex, borderPane);
 
       VertexView vertexView = new VertexView(vertex, x, y, RADIUS, false);
       vertexViewMap.put(vertex, vertexView);
       Label label = new Label(vertex.getId() + "");
       vertexView.attachLabel(label);
-      graph.addVertex(vertex);
+      mainController.graph.addVertex(vertex);
       empty.set(false);
 
       canvas.getChildren().addAll(borderPane, vertexView, label);
-      borderPaneToBack();
+      moveComponent(BorderPane.class, false);
 
       logger.info("vertex added to graph: {}", vertex);
       vertexView.setOnMousePressed(ev -> {
+        contextMenu.hide();
         Circle v = (Circle) ev.getTarget();
         logger.info("vertex selected: {}", v);
-        l = new Line();
-        l.setStrokeWidth(1.5);
-        l.setLayoutX(0);
-        l.setLayoutY(0);
-        l.setStartX(v.getCenterX());
-        l.setStartY(v.getCenterY());
-        l.setEndX(l.getStartX());
-        l.setEndY(l.getStartY());
-        canvas.getChildren().add(l);
-        if (isDirected) {
-          arrow = new Arrow(5);
-          arrow.translateXProperty().bind(l.endXProperty());
-          arrow.translateYProperty().bind(l.endYProperty());
-          Rotate rotation = new Rotate();
-          rotation.pivotXProperty().bind(l.translateXProperty());
-          rotation.pivotYProperty().bind(l.translateYProperty());
-          rotation.angleProperty().bind(
-              toDegrees(atan2(l.endYProperty().subtract(l.startYProperty()),
-                  l.endXProperty().subtract(l.startXProperty()))));
-          arrow.getTransforms().add(rotation);
-          canvas.getChildren().add(arrow);
+        if (ev.isPrimaryButtonDown()) {
+          l = new Line();
+          l.setStrokeWidth(1.5);
+          l.setLayoutX(0);
+          l.setLayoutY(0);
+          l.setStartX(v.getCenterX());
+          l.setStartY(v.getCenterY());
+          l.setEndX(l.getStartX());
+          l.setEndY(l.getStartY());
+          canvas.getChildren().add(l);
+          if (isDirected) {
+            arrow = new Arrow(5);
+            arrow.translateXProperty().bind(l.endXProperty());
+            arrow.translateYProperty().bind(l.endYProperty());
+            Rotate rotation = new Rotate();
+            rotation.pivotXProperty().bind(l.translateXProperty());
+            rotation.pivotYProperty().bind(l.translateYProperty());
+            rotation.angleProperty().bind(
+                toDegrees(atan2(l.endYProperty().subtract(l.startYProperty()),
+                    l.endXProperty().subtract(l.startXProperty()))));
+            arrow.getTransforms().add(rotation);
+            canvas.getChildren().add(arrow);
+          }
         }
         ev.consume();
       });
       vertexView.setOnMouseDragged(ev -> {
         drawLine(ev);
       });
-      vertexView.setOnMouseReleased(ev -> {
-        mouseReleased(ev);
+      vertexView.setOnMouseReleased(this::mouseReleased);
+      vertexView.setOnContextMenuRequested(ev -> {
+        contextMenu.show(vertexView, ev.getScreenX(), ev.getScreenY());
       });
       label.setOnMousePressed(ev -> {
         ev.consume();
@@ -201,67 +218,37 @@ public class DrawGraphController {
   }
 
   private void mouseReleased(MouseEvent ev) {
-    VertexView source = (VertexView) ev.getTarget();
-    canvas.getChildren().removeAll(l, arrow);
-    for (VertexView target : vertexViewMap.values()) {
-      if (target.equals(source) && !isDirected) {
-        continue;
-      }
-      Point2D point = new Point2D(ev.getX(), ev.getY());
-      Point2D center = new Point2D(target.getCenterX(), target.getCenterY());
-      if (checkInCircle(point, center, RADIUS)) {
-        Edge edge = graph.addEdge(source.getVertex(), target.getVertex());
-        if (edge == null) {
-          return;
+    if (ev.getButton() == MouseButton.PRIMARY) {
+      VertexView source = (VertexView) ev.getTarget();
+      canvas.getChildren().removeAll(l, arrow);
+      for (VertexView target : vertexViewMap.values()) {
+        if (target.equals(source) && !isDirected) {
+          continue;
         }
-        BaseEdgeView edgeView = createEdgeView(edge, source, target);
-        edgeViewMap.put(edge, edgeView);
-        canvas.getChildren().add((Node) edgeView);
-        if (isWeighted) {
-          try {
-            double weight;
-            FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/weight-info.fxml"));
-            Parent parent = loader.load();
-            WeightInfoController weightInfoController = loader.getController();
-
-            Scene newScene = new Scene(parent);
-            Stage newStage = new Stage(StageStyle.DECORATED);
-            newStage.initModality(Modality.APPLICATION_MODAL);
-            newStage.initOwner(root.getScene().getWindow());
-            newStage.setTitle("Get weight");
-            newStage.setScene(newScene);
-            newStage.setResizable(false);
-            newStage.show();
-
-            weight = weightInfoController.getWeight();
+        Point2D point = new Point2D(ev.getX(), ev.getY());
+        Point2D center = new Point2D(target.getCenterX(), target.getCenterY());
+        if (checkInCircle(point, center, RADIUS)) {
+          Edge edge = mainController.graph.addEdge(source.getVertex(), target.getVertex());
+          if (edge == null) {
+            return;
+          }
+          BaseEdgeView edgeView = createEdgeView(edge, source, target);
+          edgeViewMap.put(edge, edgeView);
+          canvas.getChildren().add((Node) edgeView);
+          if (isWeighted) {
+            double weight = getWeight();
+            mainController.graph.setWeight(edge, weight);
 
             Label label = new Label(weight + "");
             edgeView.attachLabel(label);
             canvas.getChildren().add(label);
-            weightInfoController.weightProperty.addListener((ov, oldValue, newValue) -> {
-              label.setText(newValue + "");
-              graph.setWeight(edge, (double) newValue);
-            });
-          } catch (IOException e) {
-            // TODO: handle exception
-            logger.error("Cant load weight info fxml: {}", e);
           }
-        }
 
-        logger.info("edge added to graph: {}", edge);
-        ObservableList<Node> workingCollection = FXCollections.observableArrayList(
-            canvas.getChildren());
-        // day edge xuong cuoi
-        Collections.sort(workingCollection, (n1, n2) -> {
-          if (n1 instanceof BaseEdgeView && !(n2 instanceof BaseEdgeView))
-            return -1;
-          else if (!(n1 instanceof BaseEdgeView) && n2 instanceof BaseEdgeView) {
-            return 1;
-          } else
-            return 0;
-        });
-        canvas.getChildren().setAll(workingCollection);
-        break;
+          logger.info("edge added to graph: {}", edge);
+          moveComponent(BaseEdgeView.class, false);
+          moveComponent(BorderPane.class, false);
+          break;
+        }
       }
     }
   }
@@ -300,42 +287,49 @@ public class DrawGraphController {
       edgeView = new EdgeViewLine(edge, source, target);
     }
 
-    BorderPane borderPane = new BorderPane();
-    borderPane.setLayoutX(source.getCenterX());
-    borderPane.setLayoutY(source.getCenterY() - RADIUS);
-    Point2D start = new Point2D(source.getCenterX(), source.getCenterY());
-    Point2D end = new Point2D(target.getCenterX(), target.getCenterY());
-    borderPane.setPrefSize(end.distance(start), RADIUS * 2);
-    Rotate rotate = new Rotate();
-    rotate.setAngle(Math.toDegrees(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX())));
-    borderPane.getTransforms().add(rotate);
-    borderPane.setOnMousePressed(ev -> {
-      logger.info("consume");
-      ev.consume();
-    });
     if (edgeView instanceof EdgeViewLine) {
+      BorderPane borderPane = new BorderPane();
+      borderPane.setLayoutX(source.getCenterX());
+      borderPane.setLayoutY(source.getCenterY() - RADIUS);
+      Point2D start = new Point2D(source.getCenterX(), source.getCenterY());
+      Point2D end = new Point2D(target.getCenterX(), target.getCenterY());
+      borderPane.setPrefSize(end.distance(start), RADIUS * 2);
+      Rotate rotate = new Rotate();
+      rotate.setAngle(Math.toDegrees(Math.atan2(end.getY() - start.getY(), end.getX() - start.getX())));
+      borderPane.getTransforms().add(rotate);
+      borderPane.setOnMousePressed(ev -> {
+        logger.info("consume");
+        contextMenu.hide();
+        ev.consume();
+      });
       canvas.getChildren().add(borderPane);
-      borderPaneToBack();
+      paneEdge.put(edge, borderPane);
+      moveComponent(BorderPane.class, false);
     }
+    ((Node) edgeView).setOnContextMenuRequested(ev -> {
+      contextMenu.show((Node) edgeView, ev.getScreenX(), ev.getScreenY());
+    });
     return edgeView;
   }
 
   private void reset() {
     id = 0;
-    graph = null;
+    mainController.graph = null;
     vertexViewMap = new LinkedHashMap<>();
     edgeViewMap = new LinkedHashMap<>();
-    canvas.getChildren().removeIf((node) -> true);
+    paneVertex = new LinkedHashMap<>();
+    paneEdge = new LinkedHashMap<>();
+    canvas.getChildren().clear();
   }
 
-  private void borderPaneToBack() {
+  private void moveComponent(Class<?> clazz, boolean up) {
     ObservableList<Node> workingCollection = FXCollections.observableArrayList(canvas.getChildren());
     // sort by BorderPane ascending
     Collections.sort(workingCollection, (n1, n2) -> {
-      if (n1 instanceof BorderPane && !(n2 instanceof BorderPane))
-        return -1;
-      else if (n2 instanceof BorderPane && !(n1 instanceof BorderPane))
-        return 1;
+      if (clazz.isInstance(n1) && !clazz.isInstance(n2))
+        return up ? 1 : -1;
+      else if (!clazz.isInstance(n1) && clazz.isInstance(n2))
+        return up ? -1 : 1;
       return 0;
     });
     canvas.getChildren().setAll(workingCollection);
@@ -362,5 +356,148 @@ public class DrawGraphController {
 
   public void injectMainController(CreateGraphController controller) {
     this.mainController = controller;
+  }
+
+  private void setupContextMenu() {
+    ImageView deleteView = new ImageView(getClass().getResource("/icon/delete.png").toExternalForm());
+    deleteView.setFitHeight(10);
+    deleteView.setFitWidth(10);
+    deleteItem.setGraphic(deleteView);
+    ImageView changeWeightView = new ImageView(getClass().getResource("/icon/change.png").toExternalForm());
+    changeWeightView.setFitHeight(10);
+    changeWeightView.setFitWidth(10);
+    changeItem.setGraphic(changeWeightView);
+    contextMenu.getItems().add(deleteItem);
+    contextMenu.setAutoHide(false);
+    nanoPane.prefHeight(40);
+    nanoPane.prefWidth(40);
+    nanoPane.prefHeightProperty().bind(canvas.heightProperty());
+    nanoPane.prefWidthProperty().bind(canvas.widthProperty());
+    nanoPane.setOnMousePressed(e -> {
+      contextMenu.hide();
+      e.consume();
+      canvas.getChildren().remove(nanoPane);
+    });
+
+    contextMenu.setOnHiding(e -> {
+      Node owner = contextMenu.getOwnerNode();
+      if (owner instanceof VertexView) {
+        VertexView vertexView = (VertexView) owner;
+        vertexView.selected(false);
+        logger.info("Un hi :{}", owner);
+      } else if (owner instanceof BaseEdgeView) {
+        BaseEdgeView edgeView = (BaseEdgeView) owner;
+        edgeView.selected(false);
+      }
+    });
+    contextMenu.setOnShowing(e -> {
+      Node owner = contextMenu.getOwnerNode();
+      if (owner instanceof VertexView) {
+        VertexView vertexView = (VertexView) owner;
+        vertexView.selected(true);
+        contextMenu.getItems().remove(changeItem);
+      } else if (owner instanceof BaseEdgeView) {
+        if (!contextMenu.getItems().contains(changeItem) && isWeighted) {
+          contextMenu.getItems().add(changeItem);
+        }
+        BaseEdgeView edgeView = (BaseEdgeView) owner;
+        edgeView.selected(true);
+      }
+      canvas.getChildren().add(nanoPane);
+    });
+
+    deleteItem.setOnAction(e -> {
+      Node owner = contextMenu.getOwnerNode();
+      if (owner instanceof VertexView) {
+        VertexView vertexView = (VertexView) owner;
+        // mainController.deleteVertex(vertexView.getVertex());
+        deleteVertex(vertexView.getVertex());
+      } else if (owner instanceof BaseEdgeView) {
+        BaseEdgeView edgeView = (BaseEdgeView) owner;
+        // mainController.deleteEdge(edgeView.getEdge());
+        deleteEdge(edgeView.getEdge());
+      }
+      contextMenu.hide();
+      e.consume();
+    });
+
+    changeItem.setOnAction(e -> {
+      contextMenu.hide();
+      Node owner = contextMenu.getOwnerNode();
+      if (isWeighted && owner instanceof BaseEdgeView) {
+        BaseEdgeView edgeView = (BaseEdgeView) owner;
+        double weight = getWeight();
+        mainController.graph.setWeight(edgeView.getEdge(), weight);
+        edgeView.getAttachedLabel().setText(String.valueOf(weight));
+      }
+      e.consume();
+    });
+  }
+
+  private void deleteEdge(Edge edge) {
+    if (mainController.graph.removeEdge(edge)) {
+      BaseEdgeView edgeView = edgeViewMap.get(edge);
+      edgeViewMap.remove(edge);
+      Label label = edgeView.getAttachedLabel();
+      if (label != null) {
+        canvas.getChildren().remove(label);
+      }
+      Arrow arrow = edgeView.getAttatchedArrow();
+      if (arrow != null) {
+        canvas.getChildren().remove(arrow);
+      }
+      BorderPane borderPane = paneEdge.get(edge);
+      if (borderPane != null) {
+        canvas.getChildren().remove(borderPane);
+      }
+      canvas.getChildren().remove((Node) edgeView);
+      paneEdge.remove(edge);
+    }
+  }
+
+  private void deleteVertex(Vertex vertex) {
+    mainController.graph.edgesOf(vertex).forEach(e -> {
+      deleteEdge(e);
+    });
+    if (mainController.graph.removeVertex(vertex)) {
+      VertexView vertexView = vertexViewMap.get(vertex);
+      Label label = vertexView.getAttachedLabel();
+      if (label != null) {
+        canvas.getChildren().remove(label);
+      }
+      vertexViewMap.remove(vertex);
+      BorderPane borderPane = paneVertex.get(vertex);
+      if (borderPane != null) {
+        canvas.getChildren().remove(borderPane);
+      }
+      canvas.getChildren().remove((Node) vertexView);
+      paneVertex.remove(vertex);
+    }
+  }
+
+  private double getWeight() {
+    try {
+      double weight;
+      FXMLLoader loader = new FXMLLoader(getClass().getResource("/fxml/weight-info.fxml"));
+      Parent parent = loader.load();
+      WeightInfoController weightInfoController = loader.getController();
+
+      Scene newScene = new Scene(parent);
+      Stage newStage = new Stage(StageStyle.DECORATED);
+      newStage.initModality(Modality.APPLICATION_MODAL);
+      newStage.initOwner(root.getScene().getWindow());
+      newStage.setTitle("Get weight");
+      newStage.setScene(newScene);
+      newStage.setResizable(false);
+      newStage.showAndWait();
+
+      weight = weightInfoController.getWeight();
+
+      return weight;
+    } catch (IOException e) {
+      // TODO: handle exception
+      logger.error("Cant load weight info fxml: {}", e);
+      return 0;
+    }
   }
 }

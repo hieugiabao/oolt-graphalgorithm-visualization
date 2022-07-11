@@ -77,10 +77,12 @@ public class MainController implements Initializable {
 
   public void selectVertex(Vertex v) {
     logger.info("Selected vertex: " + v);
+    graphPane.selectVertex(v);
   }
 
   public void selectEdge(Edge e) {
     logger.info("Selected vertex: " + e);
+    graphPane.selectEdge(e);
   }
 
   private void drawGraph() {
@@ -113,5 +115,9 @@ public class MainController implements Initializable {
 
   public void clearDisplay() {
     graphPane.setState(new State(new LinkedList<Vertex>(graph.vertexSet()), new LinkedList<Edge>(graph.edgeSet())));
+  }
+
+  public boolean isPlaying() {
+    return controlController.isPlaying();
   }
 }

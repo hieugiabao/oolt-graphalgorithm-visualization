@@ -64,10 +64,11 @@ public abstract class BaseGraph<E extends Edge> {
   }
 
   public boolean removeVertex(Vertex v) {
+    edgesOf(v).forEach(e -> removeEdge(e));
     return vertices.remove(v);
   }
 
-  public boolean removeEdge(E e) {
+  public boolean removeEdge(Edge e) {
     return edges.remove(e);
   }
 

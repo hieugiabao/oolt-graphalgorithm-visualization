@@ -13,4 +13,6 @@ public interface BaseEdgeView extends LabeledNode, StylableNode {
   public Label getAttachedLabel();
 
   public void setState(State.EdgeState state);
+
+  public void selected(boolean b);
 }

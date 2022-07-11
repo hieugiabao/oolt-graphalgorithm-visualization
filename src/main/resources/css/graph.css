@@ -8,6 +8,7 @@
   -fx-stroke: #333;
   -fx-stroke-type: inside;
   -fx-fill: #eee;
+  -fx-cursor: hand;
 }
 
 .vertex-label {
@@ -24,6 +25,10 @@
   -fx-opacity: 0.8;
 }
 
+.edge:hover {
+  -fx-cursor: hand;
+}
+
 .edge-label {
   -fx-font: normal 9pt "sans-serif";
   -fx-fill: #333;
@@ -33,6 +38,21 @@
   -fx-stroke-width: 2.5;
   -fx-stroke: #333;  
   -fx-opacity: 0.8;
+}
+
+
+.vertex-selected {
+  -fx-stroke: #4be60e;
+  -fx-fill: #eee;
+}
+
+.edge-selected, .arrow-selected {
+  -fx-stroke: #ecec24;
+  -fx-stroke-dash-array: 2 5 2 5;
+}
+
+.edge-label-selected {
+  -fx-fill: #ecec24;
 }
 
 .vertex-unqueued {

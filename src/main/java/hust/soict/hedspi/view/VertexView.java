@@ -262,4 +262,12 @@ public class VertexView extends Circle implements StylableNode, LabeledNode {
         break;
     }
   }
+
+  public void selected(boolean b) {
+    if (b) {
+      addStyleClass("vertex-selected");
+    } else {
+      removeStyleClass("vertex-selected");
+    }
+  }
 }

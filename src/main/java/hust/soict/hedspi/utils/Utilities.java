@@ -2,9 +2,13 @@ package hust.soict.hedspi.utils;
 
 import static javafx.beans.binding.Bindings.createDoubleBinding;
 
+import java.util.List;
+
 import javafx.beans.binding.DoubleBinding;
 import javafx.beans.value.ObservableDoubleValue;
 import javafx.geometry.Point2D;
+import javafx.scene.Node;
+import javafx.scene.Parent;
 
 public class Utilities {
 
@@ -67,5 +71,28 @@ public class Utilities {
   public static boolean checkInCircle(Point2D point, Point2D center, double radius) {
     double distance = point.distance(center);
     return distance <= radius;
+  }
+
+  public static Node pick(Node node, double x, double y) {
+    Point2D p = new Point2D(x, y);
+    if (!node.contains(p))
+      return null;
+
+    if (node instanceof Parent) {
+      Node bsetMatchingChild = null;
+      List<Node> children = ((Parent) node).getChildrenUnmodifiable();
+      for (int i = children.size() - 1; i >= 0; i--) {
+        Node child = children.get(i);
+        if (child.isVisible() && !child.isMouseTransparent() && child.contains(p)) {
+          bsetMatchingChild = child;
+          break;
+        }
+      }
+
+      if (bsetMatchingChild != null)
+        return pick(bsetMatchingChild, x, y);
+    }
+
+    return node;
   }
 }

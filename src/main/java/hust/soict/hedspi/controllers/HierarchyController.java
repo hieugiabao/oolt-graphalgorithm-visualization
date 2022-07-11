@@ -104,10 +104,18 @@ public class HierarchyController {
     treeView.setShowRoot(false);
     treeView.prefHeightProperty().bind(root.heightProperty().subtract(28));
     treeView.getSelectionModel().selectedItemProperty().addListener((ov, o, n) -> {
-      if (vertexTree.get(n) != null) {
-        mainController.selectVertex(vertexTree.get(n));
-      } else if (edgeTree.get(n) != null) {
-        mainController.selectEdge(edgeTree.get(n));
+      if (!mainController.isPlaying()) {
+        if (vertexTree.get(n) != null) {
+          mainController.selectVertex(vertexTree.get(n));
+        } else if (edgeTree.get(n) != null) {
+          mainController.selectEdge(edgeTree.get(n));
+        } else {
+          mainController.selectEdge(null);
+          mainController.selectVertex(null);
+        }
+      } else {
+        mainController.selectEdge(null);
+        mainController.selectVertex(null);
       }
     });
     root.getChildren().add(treeView);

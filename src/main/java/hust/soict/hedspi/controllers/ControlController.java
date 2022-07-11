@@ -224,13 +224,14 @@ public class ControlController implements Initializable {
       } else if (doubleValue >= 1.125 && doubleValue < 1.375) {
         doubleValue = 1.25;
       } else
+
         doubleValue = 1.5;
 
       doubleValue = boundValue(doubleValue, speedControl.getMin(), speedControl.getMax());
       speedControl.setValue(doubleValue);
       animationDuration = (int) (DEFAULT_DURATION / speedControl.getValue());
       if (isPlaying && !isPaused) {
-        pause();
+        sequentialTransition.stop();
         if (pauseControl == null) {
           pauseControl = new PauseTransition(Duration.millis(animationDuration));
           pauseControl.setOnFinished(ev -> {
@@ -279,7 +280,9 @@ public class ControlController implements Initializable {
 
     progressSlider.setOnMouseDragged(e -> {
       if (isPlaying && e.isPrimaryButtonDown()) {
-        pause();
+        if (!isPaused) {
+          sequentialTransition.stop();
+        }
         jumpToIteration((int) (progressSlider.getValue()));
       }
     });
@@ -382,18 +385,15 @@ public class ControlController implements Initializable {
   }
 
   private void reset() {
+    if (isPlaying) {
+      stop();
+    }
     maxIteration = 0;
-    isPlaying = false;
-    isPaused = false;
     currentIteration = NO_ITERATION;
     progressSlider.setMax(0);
     progressSlider.setValue(0);
     menuAlgo.setText("Choose Algorithm");
     primBtn.getItems().clear();
-  }
-
-  private boolean isAtEnd() {
-    return (currentIteration == maxIteration);
   }
 
   private void stop() {
@@ -611,5 +611,9 @@ public class ControlController implements Initializable {
         logger.error("Error when save file", e);
       }
     }
+  }
+
+  public boolean isPlaying() {
+    return isPlaying && !isPaused;
   }
 }
