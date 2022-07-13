@@ -36,9 +36,9 @@ public class Prim extends SpanningTreeAlgorithm {
   }
 
   private class VertexInfo {
-    public Vertex vertex;
-    public double distance;
-    public Edge parentEdge;
+    Vertex vertex;
+    double distance;
+    Edge parentEdge;
 
     @Override
     public int hashCode() {

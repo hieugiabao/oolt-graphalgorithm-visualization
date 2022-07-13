@@ -95,6 +95,7 @@ public class GraphInfoController implements Initializable {
 
     cancelButton.onMouseClickedProperty().set(e -> {
       logger.debug("Cancel button clicked");
+      mainController.graph = null;
       cancelButton.getScene().getWindow().hide();
     });
 

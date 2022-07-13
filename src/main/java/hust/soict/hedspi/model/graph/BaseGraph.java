@@ -58,7 +58,7 @@ public abstract class BaseGraph<E extends Edge> {
   public E addEdge(Vertex source, Vertex target, double weight) {
     E e = addEdge(source, target);
     if (e != null) {
-      e.setWeight(weight);
+      this.setWeight(e, weight);
     }
     return e;
   }
@@ -96,7 +96,7 @@ public abstract class BaseGraph<E extends Edge> {
     return result;
   }
 
-  public double getWeight(E e) {
+  public double getWeight(Edge e) {
     return e.getWeight();
   }
 

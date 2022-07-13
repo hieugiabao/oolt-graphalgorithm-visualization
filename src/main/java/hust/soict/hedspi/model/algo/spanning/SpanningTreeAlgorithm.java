@@ -1,8 +1,6 @@
 package hust.soict.hedspi.model.algo.spanning;
 
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import hust.soict.hedspi.model.algo.Algorithm;
 import hust.soict.hedspi.model.algo.step.Step;
@@ -10,8 +8,6 @@ import hust.soict.hedspi.model.graph.BaseGraph;
 import hust.soict.hedspi.model.graph.Edge;
 
 public abstract class SpanningTreeAlgorithm extends Algorithm {
-  protected final Map<Integer, String> pseudoCode = new HashMap<Integer, String>();
-
   protected SpanningTreeAlgorithm(BaseGraph<?> graph) {
     super(graph);
   }
@@ -65,9 +61,5 @@ public abstract class SpanningTreeAlgorithm extends Algorithm {
       spanningTree = getSpanningTree();
     }
     return steps;
-  }
-
-  public Map<Integer, String> getPseudoCode() {
-    return pseudoCode;
   }
 }

@@ -10,5 +10,6 @@ module oolt.project {
   opens hust.soict.hedspi.controllers to javafx.fxml;
 
   exports hust.soict.hedspi.model;
+  exports hust.soict.hedspi.model.graph;
   exports hust.soict.hedspi;
 }
